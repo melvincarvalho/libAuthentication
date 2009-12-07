@@ -2,9 +2,7 @@
 //-----------------------------------------------------------------------------------------------------------------------------------
 //
 // Filename   : libAuthentication.php                                                                                                  
-// Date       : 5th Mar 2009
-//
-// See Also   : https://foaf.me/testLibAuthentication.php
+// Date       : 5th Dec 2009
 //
 // Copyright 2008-2009 foaf.me
 //
@@ -142,7 +140,7 @@ function get_all_friends($store, $agenturi) {
 			SELECT ?name ?seeAlso ?y ?mbox ?homepage ?x ?accountName WHERE {  
 				  ?x foaf:knows ?y .  
 				  OPTIONAL { ?y foaf:name ?name } .  
-				  OPTIONAL { ?y rdfs:seeAlso ?seeAlso } . 
+				  OPTIONAL { ?y rdfs:seeAlso ?seeAlso } .  
 				  OPTIONAL { ?y foaf:mbox ?mbox } .  
 				  OPTIONAL { ?y foaf:homepage ?homepage } .
 				  OPTIONAL { ?y foaf:accountName ?accountName } . 
@@ -155,6 +153,8 @@ function get_all_friends($store, $agenturi) {
             foreach ($rows as $row) {
             //				print_r($row);
                 if (strcmp($row['y'],$agenturi)!=0) {
+					$res = NULL;
+
                     if (isset($row['name']))
                         $res = array('name'=>$row['name']);
 
@@ -189,8 +189,27 @@ function get_all_friends($store, $agenturi) {
                     $results[] = $res;
                 }
             }
+
+			foreach ($results as $key => $row) {
+			    $name[$key]  = isset($row['name'])?$row['name']:str_replace('mailto:', '', $row['webid']);
+				$seeAlso[$key] = $row['seeAlso'];
+				$mbox[$key] = $row['mbox'];
+				$homepage[$key] = $row['homepage'];
+				$about[$key] = $row['about'];
+				$webid[$key] = $row['webid'];
+			}
+
+			$name_lowercase = array_map('strtolower', $name);
+
+			// Sort the data with volume descending, edition ascending
+			// Add $data as the last parameter, to sort by the common key
+			array_multisort($name_lowercase, SORT_ASC, SORT_STRING, $results);
+			// print "<pre>";
+			// print_r($results);
+			// print "</pre>";
         }
     }
+
 
     return $results;
 }
