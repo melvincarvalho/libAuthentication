@@ -20,21 +20,21 @@ getAgent()
 
 --------------------------------------------------------------------------------
 
-getAuth() - Tests if the user has presented a SSL Client Certificate that matches to public key as expressed in a FOAF file.
-            getAuth() can work with SSL Client Certificates presented to your server or with the FOAF+SSL login delegation 
-	    server. To use the delegated FOAF+SSL version ask the user to click on something like the following. 
-	    https://foafssl.org/srv/idp?authreqissuer=http://foaf.me/index.php . In this case http://foaf.me/index.php 
-	    executes getAuth(). Alternatively configured your server to request Client Certificates on the https page the 
-	    user tries to access. The page needs to execute getAuth().
+getAuth() - Tests if the user has presented a SSL Client Certificate that matches to public key as expressed in a 
+	    FOAF file. getAuth() can work with SSL Client Certificates presented to your server or with the FOAF+SSL 
+	    login delegation server. To use the delegated FOAF+SSL version ask the user to click on something like 
+	    the following. https://foafssl.org/srv/idp?authreqissuer=http://foaf.me/index.php . In this case 
+	    http://foaf.me/index.php executes getAuth(). Alternatively configured your server to request Client 
+	    Certificates on the https page the user tries to access. The page needs to execute getAuth().
 
-	    getAuth() stores the result of the user login process in a session so subsequent calls to getAuth() do not 
-	    preform any further remote checks on FOAF files. To re-perform the FOAF fetch you need to execute 
+	    getAuth() stores the result of the user login process in a session so subsequent calls to getAuth() do 
+	    not preform any further remote checks on FOAF files. To re-perform the FOAF fetch you need to execute 
 	    unsetAuthenticatedWebID().
 
 ***WARNING***
 
-getAuth() will try to create a session variable therefore it is very important to execute getAuth() before any html is 
-sent to the client.
+getAuth() will try to create a session variable therefore it is very important to execute getAuth() before any html 
+is sent to the client.
 Further details here: http://uk3.php.net/manual/en/book.session.php
 
 
@@ -113,9 +113,9 @@ Array
 
 --------------------------------------------------------------------------------
 
-unsetAuthenticatedWebID() - Clears the login status of a previous call to getAuth() which has been stored in a session.
-                            By clearing the login status the next call of getAuth() will refetch the FOAF file presented 
-			    in the SSL Client Certificate.
+unsetAuthenticatedWebID() - Clears the login status of a previous call to getAuth() which has been stored 
+			    in a session. By clearing the login status the next call of getAuth() will refetch 
+			    the FOAF file presented in the SSL Client Certificate.
 
 
 ---------------------------------------------------------------------------------
