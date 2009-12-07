@@ -1,0 +1,597 @@
+Introduction
+============
+
+libAuthentication is a PHP implementation of the FOAF+SSL protocol
+Further details of FOAF+SSL are at http://esw.w3.org/topic/foaf+ssl
+
+To use this libAuthentication you need to add the following requires to your PHP script.
+
+require_once('config.php');
+require_once('lib/libAuthentication.php');
+
+config.php must be configured with the details of the db you have created for ARC2. 
+Further details of ARC2 are at http://arc.semsol.org/
+
+The main functions in the library are
+
+getAuth() 
+unsetAuthenticatedWebID() 
+getAgent()
+
+--------------------------------------------------------------------------------
+
+getAuth() - Tests if the user has presented a SSL Client Certificate that matches to public key as expressed in a FOAF file.
+            getAuth() can work with SSL Client Certificates presented to your server or with the FOAF+SSL login delegation server.
+	    To use the delegated FOAF+SSL version ask the user to click on something like the following. 
+	    https://foafssl.org/srv/idp?authreqissuer=http://foaf.me/index.php . In this case http://foaf.me/index.php executes getAuth()
+	    Alternatively configured your server to request Client Certificates on the https page the user tries to access. 
+	    The page needs to execute getAuth().
+
+	    getAuth() stores the result of the user login process in a session so subsequent calls to getAuth() do not preform any further 
+	    remote checks on FOAF files. To re-perform the FOAF fetch you need to execute unsetAuthenticatedWebID().
+
+***WARNING***
+
+getAuth() will try to create a session variable therefore it is very important to execute getAuth() before any html is sent to the client.
+Further details here: http://uk3.php.net/manual/en/book.session.php
+
+
+Usage
+-----
+
+$auth = getAuth();
+
+
+Returns on Failure
+------------------
+
+Array
+(
+    [isAuthenticated] => 0
+    [authDiagnostic] => No client certificate supplied on an unsecure connection
+)
+
+Other failure diagnostics are
+
+'authDiagnostic'=>'No client certificate supplied on an unsecure connection'
+'authDiagnostic'=>'No client certificate supplied'
+'authDiagnostic'=>'No RSA Key in the supplied client certificate'
+'authDiagnostic'=>'Client Certificate RSAkey does not match SAN RSAkey'
+'authDiagnostic'=>'No RSAKey found at supplied agent'
+'authDiagnostic'=>'No agent found at supplied SAN'
+
+
+Returns on Success
+==================
+
+Array
+(
+    [agent] => Array
+        (
+            [webid] => http://foaf.me/ah1#me
+            [RSAKey] => Array
+                (
+                    [modulus] => DCB422393132CE6E320A74920E882995CBF56730AFD89A4CADDF212FCFFBF8A23421D03A07EA67437716B6530E9CC9F5099A2E293EAA5220A94EB6D862ED6F5E93EBC7043E5913ED41ECF92A551F12C4FE8A03A53F075FD9B333D31FE89ACAE31C17A8BC74C6089F9979D55CBEBE5EC7110808925A227BF66FF3D8DBB12243B06964CF6EE7AABFDD87B3222257B47C213F7B6000FAD8AA4074DFB00C90A8F35F4A99C0803618429CFABF4A828A48392F657452B31908807C3A276951D5B79E1279A614E3310C748B7A9D23510D753E653932DFD32AEFD5E8E2D59A01D43BEFA2DE1ED0454174F3036E756A3176B58A67C4491126C275DB83F0FDD319C21CC2B3
+                    [exponent] => 65537
+                )
+
+            [nick] => Array
+                (
+                    [0] => ah1
+                )
+
+            [homepage] => Array
+                (
+                    [0] => http://foaf.me/ah1
+                )
+
+            [knows] => Array
+                (
+                    [0] => Array
+                        (
+                            [name] => Melvin Carvalho
+                            [about] => http://foaf.me/melvincarvalho#me
+                            [webid] => http://foaf.me/melvincarvalho#me
+                        )
+
+                    [1] => Array
+                        (
+                            [name] => Henry Story
+                            [about] => http://bblfish.net/people/henry/card#me
+                            [webid] => http://bblfish.net/people/henry/card#me
+                        )
+
+                )
+
+        )
+
+    [isAuthenticated] => 1
+    [authDiagnostic] => Client Certificate RSAkey matches SAN RSAkey
+)
+
+--------------------------------------------------------------------------------
+
+unsetAuthenticatedWebID() - Clears the login status of a previous call to getAuth() which has been stored in a session.
+                            By clearing the login status the next call of getAuth() will refetch the FOAF file presented in the SSL Client Certificate.
+
+
+---------------------------------------------------------------------------------
+
+get_agent($agenturi) - return details of the FOAF file presented as an array
+
+
+Usage
+-----
+
+$agent = get_agent('http://foaf.me/ah1');
+
+Returns on Failure
+------------------
+
+NULL
+
+Returns on Success
+------------------
+
+Array
+(
+    [agent] => Array
+        (
+            [webid] => http://bblfish.net/people/henry/card#me
+            [RSAKey] => Array
+                (
+                    [modulus] => 862D6E0B8C3252A79D6EB82966F14E495C839EC2D57983EC39BFAC79F8A99F887A3CA559CFEE438E90F73DA143CEFC0A849509D8D91E7093A94C1A39863A5BED78A0F0234A372F12DCE0A9535B14D92D56827B3791352B5817681AD7949AA7831911D51827A57E46BAD9190D73A69CE56ADA74A59DDC0DF2A7A31247BBD67445
+                    [exponent] => 65537
+                )
+
+            [name] => Henry J. Story
+            [mbox] => Array
+                (
+                    [0] => mailto:henry.story@bblfish.net
+                    [1] => mailto:henry.story@gmail.com
+                    [2] => mailto:henry.story@sun.com
+                )
+
+            [homepage] => Array
+                (
+                    [0] => http://bblfish.net/
+                )
+
+            [nick] => Array
+                (
+                    [0] => bblfish
+                )
+
+            [depiction] => http://farm1.static.flickr.com/164/373663745_e2066a4950.jpg
+            [accountProfilePage] => Array
+                (
+                    [0] => http://www.flickr.com/people/bblfish
+                    [1] => http://www.last.fm/user/bblfish
+                    [2] => http://delicious.com/bblfish
+                    [3] => http://twitter.com/bblfish
+                    [4] => http://www.twine.com/user/bblfish
+                    [5] => http://www.linkedin.com/pub/0/482/680
+                )
+
+            [knows] => Array
+                (
+                    [0] => Array
+                        (
+                            [name] => Abraham Bernstein
+                            [about] => http://www.ifi.uzh.ch/ddis/fileadmin/user_upload/avi/#me
+                            [webid] => http://www.ifi.uzh.ch/ddis/fileadmin/user_upload/avi/#me
+                        )
+
+                    [1] => Array
+                        (
+                            [name] => Andreas Blumauer
+                            [about] => http://www.semantic-web.at/people/blumauer/card#me
+                            [webid] => http://www.semantic-web.at/people/blumauer/card#me
+                        )
+
+                    [2] => Array
+                        (
+                            [name] => Anja Jentzsch
+                            [homepage] => http://www.anjeve.de/
+                            [about] => http://www.anjeve.de/foaf.rdf#AnjaJentzsch
+                            [webid] => http://www.anjeve.de/foaf.rdf#AnjaJentzsch
+                        )
+
+                    [3] => Array
+                        (
+                            [name] => Archer Phil
+                            [about] => http://www.fosi.org/people/philarcher/foaf.rdf#me
+                            [webid] => http://www.fosi.org/people/philarcher/foaf.rdf#me
+                        )
+
+                    [4] => Array
+                        (
+                            [name] => Arjohn Kampman
+                            [seeAlso] => http://www.openrdf.org/people/foaf-arjohn.rdf
+                            [webid] => http://www.openrdf.org/people/foaf-arjohn.rdf
+                        )
+
+                    [5] => Array
+                        (
+                            [name] => Arne Handt
+                            [homepage] => http://www.handtwerk.de
+                            [about] => http://handtwerk.de/foaf.rdf#arne
+                            [webid] => http://handtwerk.de/foaf.rdf#arne
+                        )
+
+                    [6] => Array
+                        (
+                            [name] => Axel Polleres
+                            [about] => http://axel.deri.ie/~axepol/foaf.rdf#me
+                            [webid] => http://axel.deri.ie/~axepol/foaf.rdf#me
+                        )
+
+                    [7] => Array
+                        (
+                            [name] => Axel Rauschmayer
+                            [homepage] => http://www.pst.ifi.lmu.de/people/staff/rauschmayer/axel-rauschmayer/
+                            [webid] => http://www.pst.ifi.lmu.de/people/staff/rauschmayer/axel-rauschmayer/
+                        )
+
+                    [8] => Array
+                        (
+                            [name] => Bruno Bonfils
+                            [about] => http://foafbuilder.qdos.com/people/asyd.myopenid.com/foaf.rdf#me
+                            [webid] => http://foafbuilder.qdos.com/people/asyd.myopenid.com/foaf.rdf#me
+                        )
+
+                    [9] => Array
+                        (
+                            [name] => Cat Bauer
+                            [homepage] => http://catbauer.com/
+                            [webid] => http://catbauer.com/
+                        )
+
+                    [10] => Array
+                        (
+                            [name] => Chimezie Ogbuji
+                            [about] => http://metacognition.info/profile/webwho.xrdf#chime
+                            [webid] => http://metacognition.info/profile/webwho.xrdf#chime
+                        )
+
+                    [11] => Array
+                        (
+                            [name] => Chris Bizer
+                            [homepage] => http://www.bizer.de
+                            [about] => http://dblp.l3s.de/d2r/page/authors/Christian_Bizer
+                            [webid] => http://dblp.l3s.de/d2r/page/authors/Christian_Bizer
+                        )
+
+                    [12] => Array
+                        (
+                            [name] => Christian Morbidoni
+                            [about] => http://semedia.deit.univpm.it/people/christian/foaf.rdf#me
+                            [webid] => http://semedia.deit.univpm.it/people/christian/foaf.rdf#me
+                        )
+
+                    [13] => Array
+                        (
+                            [name] => Christoph  Görn
+                            [about] => http://b4mad.net/FOAF/goern.rdf#goern
+                            [webid] => http://b4mad.net/FOAF/goern.rdf#goern
+                        )
+
+                    [14] => Array
+                        (
+                            [name] => Christoph Kiefer
+                            [homepage] => http://www.ifi.unizh.ch/ddis/christophkiefer.html
+                            [about] => http://www.ifi.unizh.ch/ddis/fileadmin/user_upload/kiefer/foaf.rdf#christophkiefer
+                            [webid] => http://www.ifi.unizh.ch/ddis/fileadmin/user_upload/kiefer/foaf.rdf#christophkiefer
+                        )
+
+                    [15] => Array
+                        (
+                            [name] => Christopher Schmidt
+                            [homepage] => http://crschmidt.net/
+                            [about] => http://crschmidt.net/foaf.rdf#crschmidt
+                            [webid] => http://crschmidt.net/foaf.rdf#crschmidt
+                        )
+
+                    [16] => Array
+                        (
+                            [name] => Dan Brickley
+                            [homepage] => http://danbri.org/
+                            [about] => http://danbri.org/foaf.rdf#danbri
+                            [webid] => http://danbri.org/foaf.rdf#danbri
+                        )
+
+                    [17] => Array
+                        (
+                            [name] => Dan Connolly
+                            [about] => http://www.w3.org/People/Connolly/#me
+                            [webid] => http://www.w3.org/People/Connolly/#me
+                        )
+
+                    [18] => Array
+                        (
+                            [name] => Danny Ayers
+                            [seeAlso] => http://dannyayers.com/me.rdf
+                            [homepage] => http://dannyayers.com/
+                            [webid] => http://dannyayers.com/me.rdf
+                        )
+
+                    [19] => Array
+                        (
+                            [name] => Dave Levy
+                            [about] => http://davelevy.info/foaf.rdf#me
+                            [webid] => http://davelevy.info/foaf.rdf#me
+                        )
+
+                    [20] => Array
+                        (
+                            [name] => David Peterson
+                            [about] => http://data.boab.info/david/foaf.rdf#me
+                            [webid] => http://data.boab.info/david/foaf.rdf#me
+                        )
+
+                    [21] => Array
+                        (
+                            [name] => Dean Allemang
+                            [about] => http://www.topquadrant.com/people/dallemang/foaf.rdf#me
+                            [webid] => http://www.topquadrant.com/people/dallemang/foaf.rdf#me
+                        )
+
+                    [22] => Array
+                        (
+                            [name] => Drew Perttula
+                            [homepage] => http://bigasterisk.com/
+                            [about] => http://bigasterisk.com/foaf.rdf#drewp
+                            [webid] => http://bigasterisk.com/foaf.rdf#drewp
+                        )
+
+                    [23] => Array
+                        (
+                            [name] => Edd Dumbill
+                            [homepage] => http://heddley.com/edd/
+                            [about] => http://heddley.com/edd/foaf.rdf#edd
+                            [webid] => http://heddley.com/edd/foaf.rdf#edd
+                        )
+
+                    [24] => Array
+                        (
+                            [name] => Elias Torres
+                            [about] => http://torrez.us/who#elias
+                            [webid] => http://torrez.us/who#elias
+                        )
+
+                    [25] => Array
+                        (
+                            [name] => Eric Prud'hommeaux
+                            [seeAlso] => http://www.w3.org/People/Eric/ericP-foaf.rdf
+                            [homepage] => http://www.w3.org/People/Eric/
+                            [webid] => http://www.w3.org/People/Eric/ericP-foaf.rdf
+                        )
+
+                    [26] => Array
+                        (
+                            [name] => Giovanni Tummarello
+                            [homepage] => http://g1o.net/
+                            [webid] => http://g1o.net/
+                        )
+
+                    [27] => Array
+                        (
+                            [name] => Gunnar AAstrand Grimnes
+                            [homepage] => http://www.dfki.uni-kl.de/~grimnes/
+                            [about] => http://www.dfki.uni-kl.de/~grimnes/foaf.rdf#ggrimnes
+                            [webid] => http://www.dfki.uni-kl.de/~grimnes/foaf.rdf#ggrimnes
+                        )
+
+                    [28] => Array
+                        (
+                            [name] => Halpin Harry
+                            [homepage] => http://www.ibiblio.org/hhalpin/
+                            [about] => http://www.ibiblio.org/hhalpin/#me
+                            [webid] => http://www.ibiblio.org/hhalpin/#me
+                        )
+
+                    [29] => Array
+                        (
+                            [about] => http://www.pipian.com/rdf/tami/juliette.n3#juliette
+                            [webid] => http://www.pipian.com/rdf/tami/juliette.n3#juliette
+                        )
+
+                    [30] => Array
+                        (
+                            [name] => James Gosling
+                            [about] => http://dbpedia.org/resource/James_Gosling
+                            [webid] => http://dbpedia.org/resource/James_Gosling
+                        )
+
+                    [31] => Array
+                        (
+                            [name] => Jeen Broekstra
+                            [seeAlso] => http://www.openrdf.org/people/foaf-jeen.rdf
+                            [homepage] => http://wwwis.win.tue.nl/~jbroekst/
+                            [webid] => http://www.openrdf.org/people/foaf-jeen.rdf
+                        )
+
+                    [32] => Array
+                        (
+                            [name] => Jocelyn Paine
+                            [homepage] => http://www.j-paine.org/
+                            [webid] => http://www.j-paine.org/
+                        )
+
+                    [33] => Array
+                        (
+                            [name] => Joe Gregorio
+                            [seeAlso] => http://bitworking.org/foaf.rdf
+                            [homepage] => http://bitworking.org/
+                            [webid] => http://bitworking.org/foaf.rdf
+                        )
+
+                    [34] => Array
+                        (
+                            [name] => John Black
+                            [homepage] => http://kashori.com/JohnBlack
+                            [about] => http://kashori.com/JohnBlack/foaf.rdf#jpb
+                            [webid] => http://kashori.com/JohnBlack/foaf.rdf#jpb
+                        )
+
+                    [35] => Array
+                        (
+                            [name] => Kingsley Idehen
+                            [about] => http://kingsley.idehen.name/dataspace/person/kidehen#this
+                            [webid] => http://kingsley.idehen.name/dataspace/person/kidehen#this
+                        )
+
+                    [36] => Array
+                        (
+                            [name] => Libby Miller
+                            [homepage] => http://nicecupoftea.org/
+                            [about] => http://swordfish.rdfweb.org/people/libby/rdfweb/webwho.xrdf#me
+                            [webid] => http://swordfish.rdfweb.org/people/libby/rdfweb/webwho.xrdf#me
+                        )
+
+                    [37] => Array
+                        (
+                            [name] => Max Völkel
+                            [about] => http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id2076instance
+                            [webid] => http://www.aifb.uni-karlsruhe.de/Personen/viewPersonOWL/id2076instance
+                        )
+
+                    [38] => Array
+                        (
+                            [name] => Michael G. Hausenblas
+                            [homepage] => http://www.sw-app.org/
+                            [about] => http://www.sw-app.org/foaf/mic.rdf#mic
+                            [webid] => http://www.sw-app.org/foaf/mic.rdf#mic
+                        )
+
+                    [39] => Array
+                        (
+                            [name] => Michael Zeltner
+                            [seeAlso] => http://aeim.niij.org/about/me.n3
+                            [homepage] => http://niij.org/
+                            [webid] => http://aeim.niij.org/about/me.n3
+                        )
+
+                    [40] => Array
+                        (
+                            [name] => Paul Gearon
+                            [about] => http://purl.oclc.org/NET/gearon/people/PaulGearon/foaf.rdf#me
+                            [webid] => http://purl.oclc.org/NET/gearon/people/PaulGearon/foaf.rdf#me
+                        )
+
+                    [41] => Array
+                        (
+                            [name] => Renfer Daniel
+                            [seeAlso] => http://kronkltd.net/data/foaf.rdf
+                            [homepage] => http://kronkltd.net/
+                            [webid] => http://kronkltd.net/data/foaf.rdf
+                        )
+
+                    [42] => Array
+                        (
+                            [name] => Richard Cyganiak
+                            [homepage] => http://richard.cyganiak.de/
+                            [about] => http://richard.cyganiak.de/foaf.rdf#cygri
+                            [webid] => http://richard.cyganiak.de/foaf.rdf#cygri
+                        )
+
+                    [43] => Array
+                        (
+                            [name] => Roy Fielding
+                            [homepage] => http://roy.gbiv.com/
+                            [about] => http://dbpedia.org/resource/Roy_Fielding
+                            [webid] => http://dbpedia.org/resource/Roy_Fielding
+                        )
+
+                    [44] => Array
+                        (
+                            [name] => Sebastian Dietzold
+                            [about] => http://sebastian.dietzold.de/terms/me
+                            [webid] => http://sebastian.dietzold.de/terms/me
+                        )
+
+                    [45] => Array
+                        (
+                            [name] => Simon Phipps
+                            [seeAlso] => http://www.webmink.net/foaf.rdf
+                            [homepage] => http://www.webmink.net/
+                            [webid] => http://www.webmink.net/foaf.rdf
+                        )
+
+                    [46] => Array
+                        (
+                            [name] => Simon Schenk
+                            [about] => http://www.uni-koblenz.de/~sschenk/foaf.rdf#me
+                            [webid] => http://www.uni-koblenz.de/~sschenk/foaf.rdf#me
+                        )
+
+                    [47] => Array
+                        (
+                            [name] => Spivack Nova
+                            [seeAlso] => http://novaspivack.typepad.com/foaf.rdf
+                            [mbox] => mailto:nova@radarnetworks.com
+                            [webid] => http://novaspivack.typepad.com/foaf.rdf
+                        )
+
+                    [48] => Array
+                        (
+                            [name] => Sören Auer
+                            [about] => http://www.informatik.uni-leipzig.de/~auer/foaf.rdf#me
+                            [webid] => http://www.informatik.uni-leipzig.de/~auer/foaf.rdf#me
+                        )
+
+                    [49] => Array
+                        (
+                            [name] => Tim Berners Lee
+                            [about] => http://www.w3.org/People/Berners-Lee/card#i
+                            [webid] => http://www.w3.org/People/Berners-Lee/card#i
+                        )
+
+                    [50] => Array
+                        (
+                            [name] => Tim Boudreau
+                            [about] => http://foafbuilder.qdos.com/people/tboudreau.myopenid.com/foaf.rdf#me
+                            [webid] => http://foafbuilder.qdos.com/people/tboudreau.myopenid.com/foaf.rdf#me
+                        )
+
+                    [51] => Array
+                        (
+                            [name] => Tim Bray
+                            [about] => http://dbpedia.org/resource/Tim_Bray
+                            [webid] => http://dbpedia.org/resource/Tim_Bray
+                        )
+
+                    [52] => Array
+                        (
+                            [name] => Torres Elias
+                            [about] => http://torrez.us/who#elias
+                            [webid] => http://torrez.us/who#elias
+                        )
+
+                    [53] => Array
+                        (
+                            [name] => Uldis Bojars
+                            [homepage] => http://kaste.lv/~captsolo
+                            [about] => http://purl.org/captsolo/semweb/foaf-captsolo.rdf#Uldis_Bojars
+                            [webid] => http://purl.org/captsolo/semweb/foaf-captsolo.rdf#Uldis_Bojars
+                        )
+
+                    [54] => Array
+                        (
+                            [name] => Venisse Emmanuel
+                            [about] => http://xircles.codehaus.org/users/evenisse/foaf#me
+                            [webid] => http://xircles.codehaus.org/users/evenisse/foaf#me
+                        )
+
+                    [55] => Array
+                        (
+                            [name] => Yochai Benkler
+                            [about] => http://dbpedia.org/resource/Yochai_Benkler
+                            [webid] => http://dbpedia.org/resource/Yochai_Benkler
+                        )
+
+                )
+
+        )
+
+)
