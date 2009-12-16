@@ -2,7 +2,9 @@
 //-----------------------------------------------------------------------------------------------------------------------------------
 //
 // Filename   : libAuthentication.php                                                                                                  
-// Date       : 5th Dec 2009
+// Date       : 5th Mar 2009
+//
+// See Also   : https://foaf.me/testLibAuthentication.php
 //
 // Copyright 2008-2009 foaf.me
 //
@@ -140,7 +142,7 @@ function get_all_friends($store, $agenturi) {
 			SELECT ?name ?seeAlso ?y ?mbox ?homepage ?x ?accountName WHERE {  
 				  ?x foaf:knows ?y .  
 				  OPTIONAL { ?y foaf:name ?name } .  
-				  OPTIONAL { ?y rdfs:seeAlso ?seeAlso } .  
+				  OPTIONAL { ?y rdfs:seeAlso ?seeAlso } . 
 				  OPTIONAL { ?y foaf:mbox ?mbox } .  
 				  OPTIONAL { ?y foaf:homepage ?homepage } .
 				  OPTIONAL { ?y foaf:accountName ?accountName } . 
@@ -210,7 +212,6 @@ function get_all_friends($store, $agenturi) {
         }
     }
 
-
     return $results;
 }
 
@@ -241,7 +242,7 @@ function get_all_nyms($store, $agenturi) {
         $q = "PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 			  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-			  SELECT ?x ?name ?seeAlso ?mbox ?homepage ?nick ?img ?depiction ?y ?accountProfilePage ?holdsAccountHomepage WHERE {  
+			  SELECT ?x ?name ?seeAlso ?mbox ?homepage ?nick ?img ?weblog ?depiction ?y ?accountProfilePage ?holdsAccountHomepage WHERE {  
 				  ?x a foaf:Person . 
 				  ?x foaf:holdsAccount ?y .
 				  OPTIONAL { ?x foaf:name ?name }.  
@@ -251,6 +252,7 @@ function get_all_nyms($store, $agenturi) {
 				  OPTIONAL { ?x foaf:homepage ?homepage } .
 				  OPTIONAL { ?x foaf:nick ?nick } .
 				  OPTIONAL { ?x foaf:img ?img } .
+				  OPTIONAL { ?x foaf:weblog ?weblog } .
 				  OPTIONAL { ?x foaf:depiction ?depiction } .
 				  OPTIONAL { ?y foaf:accountProfilePage ?accountProfilePage } .
 				  OPTIONAL { ?y foaf:homepage ?holdsAccountHomepage } .
@@ -301,6 +303,9 @@ function get_all_nyms($store, $agenturi) {
                     if (isset($row['img']))
                         $res = safe_array_merge($res, array('img'=>$row['img']));
 
+                    if (isset($row['weblog']))
+                        $res = safe_array_merge($res, array('weblog'=>$row['weblog']));
+
                     if (isset($row['depiction']))
                         $res = safe_array_merge($res, array('depiction'=>$row['depiction']));
                 }
@@ -332,7 +337,7 @@ function get_all_nyms_sec($store, $agenturi) {
         $q = "PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 			  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-			SELECT ?x ?name ?seeAlso ?mbox ?homepage ?nick ?img ?depiction ?y ?mbox_sha1sum ?accountProfilePage WHERE { 
+			SELECT ?x ?name ?seeAlso ?mbox ?homepage ?nick ?img ?weblog ?depiction ?y ?mbox_sha1sum ?accountProfilePage WHERE { 
 				  ?x a foaf:Person .  
 				  OPTIONAL { ?x foaf:name ?name }.  
 				  OPTIONAL { ?x rdfs:seeAlso ?seeAlso } . 
@@ -341,6 +346,7 @@ function get_all_nyms_sec($store, $agenturi) {
 				  OPTIONAL { ?x foaf:homepage ?homepage } .
 				  OPTIONAL { ?x foaf:nick ?nick } .
 				  OPTIONAL { ?x foaf:img ?img } .
+				  OPTIONAL { ?x foaf:weblog ?weblog } .
 				  OPTIONAL { ?x foaf:depiction ?depiction } .
 				  OPTIONAL { ?x foaf:holdsAccount ?y } .
 				  OPTIONAL { ?y foaf:accountProfilePage ?accountProfilePage } .
@@ -400,6 +406,9 @@ function get_all_nyms_sec($store, $agenturi) {
 
                     if (isset($row['img']))
                         $res = safe_array_merge($res, array('img'=>$row['img']));
+
+                    if (isset($row['weblog']))
+                        $res = safe_array_merge($res, array('weblog'=>$row['weblog']));
 
                     if (isset($row['depiction']))
                         $res = safe_array_merge($res, array('depiction'=>$row['depiction']));
