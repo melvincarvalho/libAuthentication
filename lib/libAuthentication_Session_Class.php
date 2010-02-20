@@ -51,7 +51,7 @@ class libAuthentication_Session_Class {
 
     }
 
-    public function set_authenticated_webid($webid) {
+    public function set_authenticated_webid($webid, $agent = NULL) {
         if (!is_null($webid)) {
             $authn_session = session_name();
 
@@ -59,7 +59,7 @@ class libAuthentication_Session_Class {
                 if (session_start()) {
                     $_SESSION['libAuthentication_is_authenticated'] = 1;
                     $_SESSION['libAuthentication_webid'] = $webid;
-                    $_SESSION['libAuthentication_agent'] = $NULL;
+                    $_SESSION['libAuthentication_agent'] = $agent;
                 }
             }
         }

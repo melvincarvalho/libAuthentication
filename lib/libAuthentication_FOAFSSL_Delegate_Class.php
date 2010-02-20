@@ -45,7 +45,7 @@ class libAuthentication_FOAFSSL_Delegate_Class {
             if ($session->is_authenticated) {
                 $this->webid = $session->webid;
                 $this->is_authenticated = $session->is_authenticated;
-                $this->authn_diagnostic = "Delegated FOAF+SSL response has been authenticated";
+                $this->authn_diagnostic = "Authenticated via a session";
                 return;
             }
         }
