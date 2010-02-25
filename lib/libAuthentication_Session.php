@@ -2,7 +2,7 @@
 
 //-----------------------------------------------------------------------------------------------------------------------------------
 //
-// Filename   : libAuthentication_Session_Class.php
+// Filename   : libAuthentication_Session.php
 // Date       : 14th Feb 2010
 //
 // See Also   : https://foaf.me/testLibAuthentication.php
@@ -27,7 +27,7 @@
 //
 //-----------------------------------------------------------------------------------------------------------------------------------
 
-class libAuthentication_Session_Class {
+class libAuthentication_Session {
 
     public $webid            =  NULL;
     public $is_authenticated = 0;
@@ -45,7 +45,7 @@ class libAuthentication_Session_Class {
         }
     }
 
-    public function libAuthentication_FOAFSSL_Class($is_authenticated = 0, $agent = NULL, $webid = NULL) {
+    public function libAuthentication_Session($is_authenticated = 0, $agent = NULL, $webid = NULL) {
 
         $this->__construct($is_authenticated, $agent, $webid);
 

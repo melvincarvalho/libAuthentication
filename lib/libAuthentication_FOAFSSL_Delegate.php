@@ -2,7 +2,7 @@
 
 //-----------------------------------------------------------------------------------------------------------------------------------
 //
-// Filename   : libAuthentication_FOAFSSL_Delegate_Class.php
+// Filename   : libAuthentication_FOAFSSL_Delegate.php
 // Date       : 14th Feb 2010
 //
 // See Also   : https://foaf.me/testLibAuthentication.php
@@ -26,9 +26,9 @@
 // -- Albert Einstein
 //
 //-----------------------------------------------------------------------------------------------------------------------------------
-require_once("lib/libAuthentication_Session_Class.php");
+require_once("lib/libAuthentication_Session.php");
 
-class libAuthentication_FOAFSSL_Delegate_Class {
+class libAuthentication_FOAFSSL_Delegate {
 
     public  $webid               = NULL;
     public  $is_authenticated    = 0;
@@ -41,7 +41,7 @@ class libAuthentication_FOAFSSL_Delegate_Class {
     public function __construct($create_session = TRUE, $sig_alg = 'rsa-sha1', $idp_certificate = 'foafssl.org-cert.pem', $https = NULL, $server_name = NULL, $server_port = NULL, $request_uri = NULL, $sig = NULL, $webid = NULL, $ts = NULL, $allowed_time_window = 300) {
 
         if ($create_session) {
-            $session = new libAuthentication_Session_Class();
+            $session = new libAuthentication_Session();
             if ($session->is_authenticated) {
                 $this->webid = $session->webid;
                 $this->is_authenticated = $session->is_authenticated;
@@ -133,7 +133,7 @@ class libAuthentication_FOAFSSL_Delegate_Class {
         }
     }
 
-    public function libAuthentication_ARC_FOAFSSL_Class($sig_alg = 'rsa-sha1', $idp_certificate = 'foafssl.org-cert.pem', $https = NULL, $http_host = NULL, $server_port = NULL, $request_uri = NULL, $sig = NULL, $allowed_time_window = 300) {
+    public function libAuthentication_FOAFSSL_Delegate($sig_alg = 'rsa-sha1', $idp_certificate = 'foafssl.org-cert.pem', $https = NULL, $http_host = NULL, $server_port = NULL, $request_uri = NULL, $sig = NULL, $allowed_time_window = 300) {
 
         $this->__construct($sig_alg, $idp_certificate, $https, $http_host, $server_port, $request_uri, $sig, $allowed_time_window);
 

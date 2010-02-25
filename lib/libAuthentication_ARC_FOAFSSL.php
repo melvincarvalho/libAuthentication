@@ -2,7 +2,7 @@
 
 //-----------------------------------------------------------------------------------------------------------------------------------
 //
-// Filename   : libAuthentication_ARC_FOAFSSL_Class.php
+// Filename   : libAuthentication_ARC_FOAFSSL.php
 // Date       : 14th Feb 2010
 //
 // See Also   : https://foaf.me/testLibAuthentication.php
@@ -28,10 +28,10 @@
 //-----------------------------------------------------------------------------------------------------------------------------------
 
 require_once("arc/ARC2.php");
-require_once("lib/libAuthentication_Helper_Class.php");
-require_once("lib/libAuthentication_FOAFSSL_Class.php");
+require_once("lib/libAuthentication_Helper.php");
+require_once("lib/libAuthentication_FOAFSSL.php");
 
-class libAuthentication_ARC_FOAFSSL_Class extends libAuthentication_FOAFSSL_Class
+class libAuthentication_ARC_FOAFSSL extends libAuthentication_FOAFSSL
 {
    private $ARC_config = NULL;
    private $ARC_store  = NULL;
@@ -43,7 +43,7 @@ class libAuthentication_ARC_FOAFSSL_Class extends libAuthentication_FOAFSSL_Clas
        parent::__construct($create_session, $ssl_client_cert);
    }
 
-    public function libAuthentication_ARC_FOAFSSL_Class($ARC_config, $create_session = TRUE, $ssl_client_cert = NULL) {
+    public function libAuthentication_ARC_FOAFSSL($ARC_config, $create_session = TRUE, $ssl_client_cert = NULL) {
 
         $this->__construct($ARC_config, $create_session, $ssl_client_cert);
 
@@ -51,7 +51,7 @@ class libAuthentication_ARC_FOAFSSL_Class extends libAuthentication_FOAFSSL_Clas
 
     private function create_store() {
 
-        if (libAuthentication_Helper_Class::is_valid_url($this->cert_webid)) {
+        if (libAuthentication_Helper::is_valid_url($this->cert_webid)) {
 
             $store = ARC2::getStore($this->ARC_config);
 
@@ -93,8 +93,8 @@ class libAuthentication_ARC_FOAFSSL_Class extends libAuthentication_FOAFSSL_Clas
 
       if ($rows = $this->ARC_store->query($q, 'rows')) {
             foreach ($rows as $row) {
-                $modulus =  libAuthentication_Helper_Class::cleanhex($row['mod']);
-                $exponent = libAuthentication_Helper_Class::cleanhex($row['exp']);
+                $modulus =  libAuthentication_Helper::cleanhex($row['mod']);
+                $exponent = libAuthentication_Helper::cleanhex($row['exp']);
 
                 $res[] = array( 'modulus'=>$modulus, 'exponent'=>$exponent );
             }

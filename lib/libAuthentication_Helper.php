@@ -2,7 +2,7 @@
 
 //-----------------------------------------------------------------------------------------------------------------------------------
 //
-// Filename   : libAuthentication_Helper_Class.php
+// Filename   : libAuthentication_Helper.php
 // Date       : 14th Feb 2010
 //
 // See Also   : https://foaf.me/testLibAuthentication.php
@@ -27,62 +27,54 @@
 //
 //-----------------------------------------------------------------------------------------------------------------------------------
 
-class libAuthentication_Helper_Class {
-
+class libAuthentication_Helper {
+    
     public function __construct() {
     }
-
-    public function libAuthentication_Helper_Class() {
-
+    
+    public function libAuthentication_Helper() {
+        
         $this->__construct();
-
+        
     }
-
+    
     /* Function to clean up the supplied hex and convert numbers A-F to uppercase characters eg. a:f => AF */
     function cleanhex($hex) {
-
+        
         $hex = eregi_replace("[^a-fA-F0-9]", "", $hex);
         $hex = strtoupper($hex);
         $hex = ltrim($hex, '0');
-
+        
         return($hex);
-
+        
     }
-
+    
     /* This function checks if the supplied uri is a valid uri */
-    function is_valid_url ( $url ) {
+    function is_valid_url ( $url, $get_headers_func = 'get_headers' ) {
         $url = @parse_url($url);
-
-        if ( ! $url) {
+        
+        if ( ! $url ) {
             return false;
         }
-
+        
         $url = array_map('trim', $url);
         $url['port'] = (!isset($url['port'])) ? 80 : (int)$url['port'];
         $path = (isset($url['path'])) ? $url['path'] : '';
-
+        
         if ($path == '') {
             $path = '/';
         }
-
+        
         $path .= ( isset ( $url['query'] ) ) ? "?$url[query]" : '';
-
+        
         if ( isset($url['host']) AND isset($url['scheme']) AND ( ($url['scheme']=='http') OR ($url['scheme']=='https') ) AND ($url['host']!=gethostbyname($url['host'])) ) {
-            $fp = fsockopen($url['host'], $url['port'], $errno, $errstr, 30);
-
-            if ( ! $fp ) {
-                return false;
-            }
-            fputs($fp, "HEAD $path HTTP/1.1\r\nHost: $url[host]\r\n\r\n");
-            $headers = fread ( $fp, 128 );
-            fclose ( $fp );
-
+            $headers = $get_headers_func("$url[scheme]://$url[host]:$url[port]$path");
             $headers = ( is_array ( $headers ) ) ? implode ( "\n", $headers ) : $headers;
             return ( bool ) preg_match ( '#^HTTP/.*\s+[(200|301|302)]+\s#i', $headers );
         }
         return false;
     }
-
+    
 }
 
 ?>

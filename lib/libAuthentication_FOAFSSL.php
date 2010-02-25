@@ -2,7 +2,7 @@
 
 //-----------------------------------------------------------------------------------------------------------------------------------
 //
-// Filename   : libAuthentication_FOAFSSL_Class.php
+// Filename   : libAuthentication_FOAFSSL.php
 // Date       : 14th Feb 2010
 //
 // See Also   : https://foaf.me/testLibAuthentication.php
@@ -27,10 +27,10 @@
 //
 //-----------------------------------------------------------------------------------------------------------------------------------
 
-require_once("lib/libAuthentication_Helper_Class.php");
-require_once("lib/libAuthentication_Session_Class.php");
+require_once("lib/libAuthentication_Helper.php");
+require_once("lib/libAuthentication_Session.php");
 
-abstract class libAuthentication_FOAFSSL_Class {
+abstract class libAuthentication_FOAFSSL {
 
     private $ssl_client_cert     = NULL;
     public  $cert_modulus        = NULL;
@@ -77,7 +77,7 @@ abstract class libAuthentication_FOAFSSL_Class {
         }
     }
 
-    public function libAuthentication_FOAFSSL_Class($ssl_client_cert = NULL) {
+    public function libAuthentication_FOAFSSL($ssl_client_cert = NULL) {
 
         $this->__construct($ssl_client_cert);
 
