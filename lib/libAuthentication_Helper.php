@@ -29,17 +29,20 @@
 
 class libAuthentication_Helper {
     
-    public function __construct() {
+   /*
+    *  TODO
+    * This class has only static methods, so we don't a constructor
+    *  public function __construct() {
     }
     
     public function libAuthentication_Helper() {
         
         $this->__construct();
         
-    }
+    }*/
     
     /* Function to clean up the supplied hex and convert numbers A-F to uppercase characters eg. a:f => AF */
-    function cleanhex($hex) {
+    public static function cleanhex($hex) {
         
         $hex = eregi_replace("[^a-fA-F0-9]", "", $hex);
         $hex = strtoupper($hex);
@@ -50,7 +53,7 @@ class libAuthentication_Helper {
     }
     
     /* This function checks if the supplied uri is a valid uri */
-    function is_valid_url ( $url, $get_headers_func = 'get_headers' ) {
+    public static function is_valid_url ( $url, $get_headers_func = 'get_headers' ) {
         $url = @parse_url($url);
         
         if ( ! $url ) {
