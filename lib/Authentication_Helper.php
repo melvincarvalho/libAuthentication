@@ -77,7 +77,19 @@ class Authentication_Helper {
         }
         return false;
     }
-    
+
+    /* Function to merge two arrays without thorwing exceptions */
+    public static function safeArrayMerge($a, $b) {
+        if ($b) {
+            if ($a)
+                $a = array_merge($a, $b);
+            else
+                $a = $b;
+        }
+
+        return $a;
+    }
+
 }
 
 ?>
