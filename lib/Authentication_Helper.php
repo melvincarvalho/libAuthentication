@@ -90,6 +90,29 @@ class Authentication_Helper {
         return $a;
     }
 
+    /* This function removes duplicated entries within nested arrays */
+    public function arrayUnique($myArray) {
+
+        if(!is_array($myArray))
+            return $myArray;
+
+        foreach ($myArray as &$myvalue) {
+            $myvalue=serialize($myvalue);
+        }
+
+        $myArray=array_unique($myArray);
+
+        foreach ($myArray as &$myvalue) {
+            $myvalue=unserialize($myvalue);
+        }
+
+        $res = NULL;
+        foreach ($myArray as $myvalue ) {
+            $res = Authentication_Helper::safeArrayMerge($res, array($myvalue));
+        }
+        
+        return $res;
+    }
 }
 
 ?>
