@@ -35,23 +35,25 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
    private $ARCConfig = NULL;
    private $ARCStore  = NULL;
 
-   public function __construct($ARCConfig, $agentURI) {
+   public function __construct($ARCConfig, $agentURI, $ARCStore = NULL) {
 
        $this->ARCConfig = $ARCConfig;
+       $this->ARCStore  = $ARCStore;
 
        parent::__construct($agentURI);
    }
 
-   public function Authentication_AgentARC($ARCConfig, $agentURI) {
+   public function Authentication_AgentARC($ARCConfig, $agentURI, $ARCStore = NULL) {
 
-       $this->__construct($ARCConfig, $agentuURI);
+       $this->__construct($ARCConfig, $ARCStore, $agentURI);
 
    }
 
 
    public function loadAgent() {
 
-       $this->createStore();
+       if (!isset($this->ARCStore))
+        $this->createStore();
 
    }
 
@@ -280,7 +282,12 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
                         else
                             $y = NULL;
 
-                        $webid = $this->webid($row['seeAlso'], $y, $row['homepage'], $row['mbox']);
+                        if (isset($row['seeAlso']) && (strcmp($row['seeAlso type'],'uri')==0) )
+                            $seeAlso = $row['seeAlso'];
+                        else
+                            $seeAlso = NULL;
+
+                        $webid = $this->webid($seeAlso, $y, $row['homepage'], $row['mbox']);
 
                         if ($webid != $prevWebid) {
                             if (isset($res)) {
@@ -292,7 +299,7 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
                                 $res = array('name'=>$row['name']);
 
                             if (isset($row['seeAlso']) && (strcmp($row['seeAlso type'],'uri')==0) )
-                                $res = Authentication_Helper::safeArrayMerge($res, array('seeAlso'=>$row['seeAlso']));
+                                $res = Authentication_Helper::safeArrayMerge($res, array('seeAlso'=>$seeAlso));
 
                             if (isset($row['mbox']))
                                 $res = Authentication_Helper::safeArrayMerge($res, array('mbox'=>array($row['mbox'])));

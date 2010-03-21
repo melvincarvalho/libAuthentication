@@ -34,24 +34,25 @@ require_once("lib/Authentication_FoafSSLAbstract.php");
 class Authentication_FoafSSLARC extends Authentication_FoafSSLAbstract
 {
    private $ARCConfig = NULL;
-   private $ARCStore  = NULL;
+   public  $ARCStore  = NULL;
 
-   public function __construct($ARCConfig, $createSession= TRUE, $SSLClientCert = NULL) {
+   public function __construct($ARCConfig, $ARCStore = NULL, $createSession= TRUE, $SSLClientCert = NULL) {
 
        $this->ARCConfig = $ARCConfig;
+       $this->ARCStore = $ARCStore;
 
        parent::__construct($createSession, $SSLClientCert);
    }
 
-    public function Authentication_FoafSSLARC($ARCConfig, $createSession = TRUE, $SSLClientCert = NULL) {
+    public function Authentication_FoafSSLARC($ARCConfig, $ARCStore = NULL, $createSession = TRUE, $SSLClientCert = NULL) {
 
-        $this->__construct($ARCConfig, $createSession, $SSLClientCert);
+        $this->__construct($ARCConfig, $ARCStore, $createSession, $SSLClientCert);
 
     }
 
     private function createStore() {
 
-        if (Authentication_Helper::isValidUrl($this->webid)) {
+        if ( (!isset($this->ARCStore)) && (Authentication_Helper::isValidUrl($this->webid)) ) {
 
             $store = ARC2::getStore($this->ARCConfig);
 
