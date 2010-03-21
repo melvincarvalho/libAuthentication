@@ -71,10 +71,6 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
             if ( $nyms = $this->getAgentNyms() ) {
                 $agent = $nyms;
             }
-//            else if ($holdAccount = $this->getOnlineAccount()) {
-//                if ($nyms = $this->getAgentProperties($holdAccount)) {
-//                            return($nyms);
-//            }
 
             if ($agentRSAKey = $this->getFoafRSAKey())
                 $agent = Authentication_Helper::safeArrayMerge($agent, array('RSAKey'=>$agentRSAKey));
@@ -275,46 +271,63 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
 	        }";
 
             if ($rows = $this->ARCStore->query($q, 'rows')) {
+                $res=NULL;
                 foreach ($rows as $row) {
                     if ( (strcmp($row['x'],$this->agentId)==0) && (strcmp($row['y'],$this->agentId)!=0) ) {
-                        $res = NULL;
 
-                        if (isset($row['name']))
-                            $res = array('name'=>$row['name']);
-
-                        if (isset($row['seeAlso']) && (strcmp($row['seeAlso type'],'uri')==0) )
-                            $res = Authentication_Helper::safeArrayMerge($res, array('seeAlso'=>$row['seeAlso']));
-
-                        if (isset($row['mbox']))
-                            $res = Authentication_Helper::safeArrayMerge($res, array('mbox'=>$row['mbox']));
-
-                        if (isset($row['homepage']))
-                            $res = Authentication_Helper::safeArrayMerge($res, array('homepage'=>$row['homepage']));
-
-                        if (isset($row['y']) && (strcmp($row['y type'],'uri')==0) ) {
+                        if (isset($row['y']) && (strcmp($row['y type'],'uri')==0) )
                             $y = $row['y'];
-                            $res = Authentication_Helper::safeArrayMerge($res, array('about'=>$y));
-                        } else
+                        else
                             $y = NULL;
 
-                        $res = Authentication_Helper::safeArrayMerge($res, array('webid'=>$this->webid($row['seeAlso'], $y, $row['homepage'], $row['mbox'])));
+                        $webid = $this->webid($row['seeAlso'], $y, $row['homepage'], $row['mbox']);
 
-                        $results[] = $res;
+                        if ($webid != $prevWebid) {
+                            if (isset($res)) {
+                                $results[] = $res;
+                                $res = NULL;
+                            }
+
+                            if (isset($row['name']))
+                                $res = array('name'=>$row['name']);
+
+                            if (isset($row['seeAlso']) && (strcmp($row['seeAlso type'],'uri')==0) )
+                                $res = Authentication_Helper::safeArrayMerge($res, array('seeAlso'=>$row['seeAlso']));
+
+                            if (isset($row['mbox']))
+                                $res = Authentication_Helper::safeArrayMerge($res, array('mbox'=>array($row['mbox'])));
+
+                            if (isset($row['homepage']))
+                                $res = Authentication_Helper::safeArrayMerge($res, array('homepage'=>$row['homepage']));
+
+                            if (isset($y))
+                                $res = Authentication_Helper::safeArrayMerge($res, array('about'=>$y));
+
+                            $res = Authentication_Helper::safeArrayMerge($res, array('webid'=>$webid));
+
+                            $prevWebid = $webid;
+                        }
+                        else {
+                            if (isset($row['mbox']))
+                                $res = Authentication_Helper::safeArrayMerge($res, array('mbox'=>Authentication_Helper::safeArrayMerge($res['mbox'], array($row['mbox']))));
+                        }
                     }
                 }
 
-                foreach ($results as $key => $row) {
-                    $name[$key]  = isset($row['name'])?$row['name']:str_replace('mailto:', '', $row['webid']);
-                    $seeAlso[$key] = $row['seeAlso'];
-                    $mbox[$key] = $row['mbox'];
-                    $homepage[$key] = $row['homepage'];
-                    $about[$key] = $row['about'];
-                    $webid[$key] = $row['webid'];
+                if (isset($results)) {
+                    foreach ($results as $key => $row) {
+                        $name[$key]  = isset($row['name'])?$row['name']:str_replace('mailto:', '', $row['webid']);
+                        $seeAlso[$key] = $row['seeAlso'];
+                        $mbox[$key] = $row['mbox'];
+                        $homepage[$key] = $row['homepage'];
+                        $about[$key] = $row['about'];
+                        $webid[$key] = $row['webid'];
+                    }
+
+                    $name_lowercase = array_map('strtolower', $name);
+
+                    array_multisort($name_lowercase, SORT_ASC, SORT_STRING, $results);
                 }
-
-                $name_lowercase = array_map('strtolower', $name);
-
-                array_multisort($name_lowercase, SORT_ASC, SORT_STRING, $results);
             }
         }
 /*
@@ -442,8 +455,7 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
     protected function getPrimaryProfile() {
 	if ($this->ARCStore) {
 
-            /* list names */
-
+            /*
             $q = 'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 
 	          SELECT ?x ?primaryTopic
@@ -454,33 +466,27 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
 	
             if ($rows = $this->ARCStore->query($q, 'rows')) {
 		foreach ($rows as $row) {
+                    print "primaryTopic " . $row['primaryTopic'] . "<br/>";
+                    return $row['primaryTopic'];
+		}
+            }
+            */
+            
+            // Remove foaf:PersonaProfileDoucment constraint to get http://sw-app.org/mic.xhtml#i
+            $q = 'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+
+	          SELECT ?x ?primaryTopic
+                  WHERE {
+                          ?x foaf:primaryTopic ?primaryTopic .
+	          }';
+	
+            if ($rows = $this->ARCStore->query($q, 'rows')) {
+		foreach ($rows as $row) {
 //                    print "primaryTopic " . $row['primaryTopic'] . "<br/>";
                     return $row['primaryTopic'];
 		}
             }
-	}
-    }
-
-    protected function getOnlineAccount() {
-	if ($this->ARCStore && $this->agentId) {
-            /* list names */
-            $q = 'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-                  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-
-		  SELECT ?x ?y
-                  WHERE {
-                          ?x a foaf:OnlineAccount .
-		          ?y foaf:holdsAccount ?x
-			}';
-
-		
-            if ($rows = $this->ARCStore->query($q, 'rows')) {
-                foreach ($rows as $row) {
-                    print "getOnlineAccount " . $row['y'] . "<br/>";
-                    return $row['y'];
-                }
-            }
-	}
+        }
     }
 
 }
