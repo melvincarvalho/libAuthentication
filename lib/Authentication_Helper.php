@@ -26,33 +26,32 @@
 // -- Albert Einstein
 //
 //-----------------------------------------------------------------------------------------------------------------------------------
-
+/**
+ * Collection of utility functions
+ */
 class Authentication_Helper {
     
-   /*
-    *  TODO
-    * This class has only static methods, so we don't a constructor
-    *  public function __construct() {
-    }
-    
-    public function Authentication_Helper() {
-        
-        $this->__construct();
-        
-    }*/
-    
-    /* Function to clean up the supplied hex and convert numbers A-F to uppercase characters eg. a:f => AF */
+    /**
+     * Function to clean up the supplied hex and convert numbers A-F to uppercase characters eg. a:f => AF
+     * @param string $hex the hex string to be sanitized
+     * @return string Cleaned hexadecimal value
+     */
     public static function cleanHex($hex) {
         
         $hex = eregi_replace("[^a-fA-F0-9]", "", $hex);
         $hex = strtoupper($hex);
         $hex = ltrim($hex, '0');
-        
+
         return($hex);
-        
     }
     
-    /* This function checks if the supplied uri is a valid uri */
+    /**
+     * Function to clean up the supplied hex and convert numbers A-F
+     * to uppercase characters eg. a:f => AF
+     * @param string $url The URL to be verified
+     * @param string $getHeadersFunc The function that gets the HTTP response header for the URL
+     * @return bool TRUE, if the URL was succesfully resolved and returned HTTP 200 | 301 | 302
+     */
     public static function isValidUrl ( $url, $getHeadersFunc = 'get_headers' ) {
         $url = @parse_url($url);
         
@@ -78,7 +77,12 @@ class Authentication_Helper {
         return false;
     }
 
-    /* Function to merge two arrays without thorwing exceptions */
+    /**
+     * Function to merge two arrays without thorwing exceptions
+     * @param array $a
+     * @param array $b
+     * @return array Merged array
+     */
     public static function safeArrayMerge($a, $b) {
         if ($b) {
             if ($a)
@@ -86,12 +90,15 @@ class Authentication_Helper {
             else
                 $a = $b;
         }
-
         return $a;
     }
 
-    /* This function removes duplicated entries within nested arrays */
-    public function arrayUnique($myArray) {
+    /**
+     * This function removes duplicated entries within nested arrays
+     * @param array $myarray
+     * @return array Result clean of all duplicate entries
+     */
+    public static function arrayUnique($myArray) {
 
         if(!is_array($myArray))
             return $myArray;
@@ -101,7 +108,6 @@ class Authentication_Helper {
         }
 
         $myArray=array_unique($myArray);
-
         foreach ($myArray as &$myvalue) {
             $myvalue=unserialize($myvalue);
         }
