@@ -32,39 +32,39 @@ require_once("lib/Authentication_AgentAbstract.php");
 
 class Authentication_AgentARC extends Authentication_AgentAbstract {
 
-   private $ARCConfig = NULL;
-   private $ARCStore  = NULL;
+    private $ARCConfig = NULL;
+    private $ARCStore  = NULL;
 
-   public function __construct($ARCConfig, $agentURI, $ARCStore = NULL) {
+    public function __construct($ARCConfig, $agentURI, $ARCStore = NULL) {
 
-       $this->ARCConfig = $ARCConfig;
-       $this->ARCStore  = $ARCStore;
+        $this->ARCConfig = $ARCConfig;
+        $this->ARCStore  = $ARCStore;
 
-       parent::__construct($agentURI);
-   }
+        parent::__construct($agentURI);
+    }
 
-   public function Authentication_AgentARC($ARCConfig, $agentURI, $ARCStore = NULL) {
+    public function Authentication_AgentARC($ARCConfig, $agentURI, $ARCStore = NULL) {
 
-       $this->__construct($ARCConfig, $ARCStore, $agentURI);
+        $this->__construct($ARCConfig, $ARCStore, $agentURI);
 
-   }
+    }
 
 
-   public function loadAgent() {
+    public function loadAgent() {
 
-       if (!isset($this->ARCStore))
-        $this->createStore();
+        if (!isset($this->ARCStore))
+            $this->createStore();
 
-   }
+    }
 
-   public function loadErrors() {
+    public function loadErrors() {
 
-       if (isset($this->ARCStore) && ($errs = $this->ARCStore->getErrors())) {
-           $this->errors = $errs;
-       }
-   }
+        if (isset($this->ARCStore) && ($errs = $this->ARCStore->getErrors())) {
+            $this->errors = $errs;
+        }
+    }
 
-   public function getAgentProperties() {
+    public function getAgentProperties() {
 
         $agent    = NULL;
 
@@ -81,7 +81,7 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
                 $agent = Authentication_Helper::safeArrayMerge($agent, $openID);
 
             if ($names = $this->getNameParts())
-                        $agent = Authentication_Helper::safeArrayMerge($agent, $names);
+                $agent = Authentication_Helper::safeArrayMerge($agent, $names);
 
             if ($friends = $this->getAllFriends())
                 $agent = Authentication_Helper::safeArrayMerge($agent, array('knows'=>$friends));
@@ -95,39 +95,39 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
     public function getAgentID() {
 
         $agentID = ($agentId = $this->getPrimaryProfile())?$agentId:$this->agentURI;
-        
+
         return($agentID);
     }
 
     private function createStore() {
 
-       $store = ARC2::getStore($this->ARCConfig);
+        $store = ARC2::getStore($this->ARCConfig);
 
-       if (!$store->isSetUp()) {
-           $store->setUp();
-       }
+        if (!$store->isSetUp()) {
+            $store->setUp();
+        }
 
-       $store->reset();
+        $store->reset();
 
-       /* LOAD will call the Web reader, which will call the
+        /* LOAD will call the Web reader, which will call the
 	   format detector, which in turn triggers the inclusion of an
 	   appropriate parser, etc. until the triples end up in the store. */
-       $store->query('LOAD <'.$this->agentURI.'>');
+        $store->query('LOAD <'.$this->agentURI.'>');
 
-       $this->ARCStore = $store;
+        $this->ARCStore = $store;
 
-       return $store;
-   }
+        return $store;
+    }
 
-   /* Returns an array of the modulus and exponent in the supplied RDF */
-   protected function getFoafRSAKey() {
+    /* Returns an array of the modulus and exponent in the supplied RDF */
+    protected function getFoafRSAKey() {
 
-       $modulus = NULL;
-       $exponent = NULL;
-       $res = NULL;
+        $modulus = NULL;
+        $exponent = NULL;
+        $res = NULL;
 
-       /* list names */
-       $q = " PREFIX cert: <http://www.w3.org/ns/auth/cert#>
+        /* list names */
+        $q = " PREFIX cert: <http://www.w3.org/ns/auth/cert#>
               PREFIX rsa: <http://www.w3.org/ns/auth/rsa#>
 
               SELECT ?m ?e ?mod ?exp ?person
@@ -139,39 +139,39 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
                        OPTIONAL { ?e cert:decimal ?exp . }
                     } ";
 
-       if ($rows = $this->ARCStore->query($q, 'rows')) {
+        if ($rows = $this->ARCStore->query($q, 'rows')) {
 
-           foreach ($rows as $row) {
-               if ($row['person']==$this->agentId) {
+            foreach ($rows as $row) {
+                if ($row['person']==$this->agentId) {
 
-                   if (isset($row['mod']))
-                       $modulus =  $row['mod'];
-                   elseif (isset($row['m']))
-                       $modulus =  $row['m'];
+                    if (isset($row['mod']))
+                        $modulus =  $row['mod'];
+                    elseif (isset($row['m']))
+                        $modulus =  $row['m'];
 
-                   if (isset($row['exp']))
-                       $exponent = $row['exp'];
-                   elseif (isset($row['e']))
-                       $exponent = $row['e'];
+                    if (isset($row['exp']))
+                        $exponent = $row['exp'];
+                    elseif (isset($row['e']))
+                        $exponent = $row['e'];
 
-                   $modulus =  Authentication_Helper::cleanHex($row['mod']);
-                   $exponent = Authentication_Helper::cleanHex($row['exp']);
+                    $modulus =  Authentication_Helper::cleanHex($modulus);
+                    $exponent = Authentication_Helper::cleanHex($exponent);
 
-                   $res[] = array( 'modulus'=>$modulus, 'exponent'=>$exponent );
+                    $res[] = array( 'modulus'=>$modulus, 'exponent'=>$exponent );
 
-               }
-           }
-       }
+                }
+            }
+        }
 
         if (isset($res))
             $res = Authentication_Helper::arrayUnique($res);
-/*
+        /*
         print "getFoafRSAKey<pre>";
         print_r($res);
         print "<pre/>";
-*/
+        */
         return($res);
-   }
+    }
 
 
     protected function getNameParts() {
@@ -219,47 +219,47 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
             if ($rows = $this->ARCStore->query($q, 'rows')) {
 
 
-                 foreach ($rows as $row) {
-                     if (strcmp($row['webid'],$this->agentId)==0) {
-                         if (isset($row['firstname']))
-                               $res = Authentication_Helper::safeArrayMerge($res, array('firstname'=>$row['firstname']));
+                foreach ($rows as $row) {
+                    if (strcmp($row['webid'],$this->agentId)==0) {
+                        if (isset($row['firstname']))
+                            $res = Authentication_Helper::safeArrayMerge($res, array('firstname'=>$row['firstname']));
 
-                          if (isset($row['lastname']))
-                              $res = Authentication_Helper::safeArrayMerge($res, array('lastname'=>$row['lastname']));
+                        if (isset($row['lastname']))
+                            $res = Authentication_Helper::safeArrayMerge($res, array('lastname'=>$row['lastname']));
 
-                     }
+                    }
                 }
             }
         }
-/*
+        /*
         print "NameParts <pre>";
         print_r($res);
         print "<pre/>";
-*/
+        */
         return $res;
     }
 
-   protected function webid($seeAlso, $about, $homepage, $mbox) {
-       if ($seeAlso)
-           return $seeAlso;
+    protected function webid($seeAlso, $about, $homepage, $mbox) {
+        if ($seeAlso)
+            return $seeAlso;
 
-       if ($about)
-           return $about;
+        if ($about)
+            return $about;
 
-       if ($homepage)
-           return $homepage;
+        if ($homepage)
+            return $homepage;
 
-       return $mbox;
-   }
+        return $mbox;
+    }
 
-   protected function getAllFriends() {
-   
-       $results = NULL;
+    protected function getAllFriends() {
 
-       if ($this->ARCStore && $this->agentId) {
+        $results = NULL;
 
-        /* list names */
-           $q = "PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+        if ($this->ARCStore && $this->agentId) {
+
+            /* list names */
+            $q = "PREFIX foaf: <http://xmlns.com/foaf/0.1/>
                  PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
 		 SELECT ?name ?seeAlso ?y ?mbox ?homepage ?x ?accountName
@@ -337,20 +337,19 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
                 }
             }
         }
-/*
+        /*
         print "getAllFriends<pre>";
         print_r($results);
         print "<pre/>";
-*/
+        */
         return $results;
 
     }
 
     protected function getAgentNyms() {
-	$res =  NULL;
- 
-	if ($this->ARCStore && $this->agentId)
-	{
+        $res =  NULL;
+
+        if ($this->ARCStore && $this->agentId) {
             /* list names */
             $q = "PREFIX foaf: <http://xmlns.com/foaf/0.1/>
                   PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -370,58 +369,58 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
 			  OPTIONAL { ?y foaf:accountProfilePage ?accountProfilePage } .
 		        }";
 
-              if ($rows = $this->ARCStore->query($q, 'rows')) {
-                  print_r($con);
-                  
-                  foreach ($rows as $row) {
-                      if ( (strcmp($row['x'],$this->agentId)==0) ) {
+            if ($rows = $this->ARCStore->query($q, 'rows')) {
+                print_r($con);
 
-                          if (isset($row['name']))
-                              $res = Authentication_Helper::safeArrayMerge($res, array('name'=>$row['name']));
+                foreach ($rows as $row) {
+                    if ( (strcmp($row['x'],$this->agentId)==0) ) {
 
-                          if ( isset($row['seeAlso'])  && (strcmp($row['seeAlso type'],'uri')==0) )
-                                $res = Authentication_Helper::safeArrayMerge($res, array('seeAlso'=>array_unique(Authentication_Helper::safeArrayMerge($res['seeAlso'], array($row['seeAlso'])))));
+                        if (isset($row['name']))
+                            $res = Authentication_Helper::safeArrayMerge($res, array('name'=>$row['name']));
 
-			  if (isset($row['mbox']))
-                              $res = Authentication_Helper::safeArrayMerge($res, array('mbox'=>array_unique(Authentication_Helper::safeArrayMerge($res['mbox'], array($row['mbox'])))));
+                        if ( isset($row['seeAlso'])  && (strcmp($row['seeAlso type'],'uri')==0) )
+                            $res = Authentication_Helper::safeArrayMerge($res, array('seeAlso'=>array_unique(Authentication_Helper::safeArrayMerge($res['seeAlso'], array($row['seeAlso'])))));
 
-                          if (isset($row['mbox_sha1sum']))
-                              $res = Authentication_Helper::safeArrayMerge($res, array('mbox_sha1sum'=>array_unique(Authentication_Helper::safeArrayMerge($res['mbox_sha1sum'], array($row['mbox_sha1sum'])))));
+                        if (isset($row['mbox']))
+                            $res = Authentication_Helper::safeArrayMerge($res, array('mbox'=>array_unique(Authentication_Helper::safeArrayMerge($res['mbox'], array($row['mbox'])))));
 
-			  if (isset($row['homepage']))
-                              $res = Authentication_Helper::safeArrayMerge($res, array('homepage'=>array_unique(Authentication_Helper::safeArrayMerge($res['homepage'], array($row['homepage'])))));
+                        if (isset($row['mbox_sha1sum']))
+                            $res = Authentication_Helper::safeArrayMerge($res, array('mbox_sha1sum'=>array_unique(Authentication_Helper::safeArrayMerge($res['mbox_sha1sum'], array($row['mbox_sha1sum'])))));
 
-                          if (isset($row['nick']))
-                              $res = Authentication_Helper::safeArrayMerge($res, array('nick'=>array_unique(Authentication_Helper::safeArrayMerge($res['nick'], array($row['nick'])))));
+                        if (isset($row['homepage']))
+                            $res = Authentication_Helper::safeArrayMerge($res, array('homepage'=>array_unique(Authentication_Helper::safeArrayMerge($res['homepage'], array($row['homepage'])))));
 
-                          if (isset($row['accountProfilePage']))
-                              $res = Authentication_Helper::safeArrayMerge($res, array('accountProfilePage'=>array_unique(Authentication_Helper::safeArrayMerge($res['accountProfilePage'], array($row['accountProfilePage'])))));
+                        if (isset($row['nick']))
+                            $res = Authentication_Helper::safeArrayMerge($res, array('nick'=>array_unique(Authentication_Helper::safeArrayMerge($res['nick'], array($row['nick'])))));
 
-                          if ( isset($row['y']) && (strcmp($row['y type'],'uri')==0) )
-                              $res = Authentication_Helper::safeArrayMerge($res, array('holdsAccount'=>array_unique(Authentication_Helper::safeArrayMerge($res['holdsAccount'], array($row['y'])))));
+                        if (isset($row['accountProfilePage']))
+                            $res = Authentication_Helper::safeArrayMerge($res, array('accountProfilePage'=>array_unique(Authentication_Helper::safeArrayMerge($res['accountProfilePage'], array($row['accountProfilePage'])))));
+
+                        if ( isset($row['y']) && (strcmp($row['y type'],'uri')==0) )
+                            $res = Authentication_Helper::safeArrayMerge($res, array('holdsAccount'=>array_unique(Authentication_Helper::safeArrayMerge($res['holdsAccount'], array($row['y'])))));
 
 //                          if (isset($row['holdsAccountHomepage']))
 //                              $res = Authentication_Helper::safeArrayMerge($res, array('holdsAccount'=>array_unique(Authentication_Helper::safeArrayMerge($res['holdsAccount'], array($row['holdsAccountHomepage'])))));
 
 
-                          if (isset($row['weblog']))
-                              $res = Authentication_Helper::safeArrayMerge($res, array('weblog'=>$row['weblog']));
+                        if (isset($row['weblog']))
+                            $res = Authentication_Helper::safeArrayMerge($res, array('weblog'=>$row['weblog']));
 
-                          if (isset($row['img']))
-                              $res = Authentication_Helper::safeArrayMerge($res, array('img'=>$row['img']));
+                        if (isset($row['img']))
+                            $res = Authentication_Helper::safeArrayMerge($res, array('img'=>$row['img']));
 
-                          if (isset($row['depiction']))
-                              $res = Authentication_Helper::safeArrayMerge($res, array('depiction'=>$row['depiction']));
-                      }
-		}
+                        if (isset($row['depiction']))
+                            $res = Authentication_Helper::safeArrayMerge($res, array('depiction'=>$row['depiction']));
+                    }
+                }
             }
-	}
-/*
+        }
+        /*
         print "getNyms2<pre>";
         print_r($res);
         print "<pre/>";
-*/
-	return $res;
+        */
+        return $res;
     }
 
     protected function getOpenID() {
@@ -451,16 +450,16 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
                 }
             }
         }
-/*
+        /*
         print "getOpenID<pre>";
         print_r($res);
         print "<pre/>";
-*/
+        */
         return $res;
     }
 
     protected function getPrimaryProfile() {
-	if ($this->ARCStore) {
+        if ($this->ARCStore) {
 
             /*
             $q = 'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
@@ -478,7 +477,7 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
 		}
             }
             */
-            
+
             // Remove foaf:PersonaProfileDoucment constraint to get http://sw-app.org/mic.xhtml#i
             $q = 'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 
@@ -486,12 +485,12 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
                   WHERE {
                           ?x foaf:primaryTopic ?primaryTopic .
 	          }';
-	
+
             if ($rows = $this->ARCStore->query($q, 'rows')) {
-		foreach ($rows as $row) {
+                foreach ($rows as $row) {
 //                    print "primaryTopic " . $row['primaryTopic'] . "<br/>";
                     return $row['primaryTopic'];
-		}
+                }
             }
         }
     }

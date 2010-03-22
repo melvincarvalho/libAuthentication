@@ -51,7 +51,7 @@ class Authentication {
             print_r($session);
             print "</pre>";
 */
-//            return;
+            return;
          }
 
          $sig = isset($sig)?$sig:$_GET["sig"];
