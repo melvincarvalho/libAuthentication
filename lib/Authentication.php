@@ -33,18 +33,20 @@ require_once("lib/Authentication_AgentARC.php");
 
 class Authentication {
 
-    public $webid             = NULL;
-    public $isAuthenticated   = 0;
-    public $authnDiagnostic   = NULL;
-    public $agent = NULL;
+    public  $webid             = NULL;
+    public  $isAuthenticated   = 0;
+    public  $authnDiagnostic   = NULL;
+    public  $agent = NULL;
+
+    private $session = NULL;
 
     public function __construct($ARCConfig, $sig = NULL) {
 
-        $session = new Authentication_Session();
-        if ($session->isAuthenticated) {
-            $this->webid           = $session->webid;
-            $this->isAuthenticated = $session->isAuthenticated;
-            $this->agent           = $session->agent;
+        $this->session = new Authentication_Session();
+        if ($this->session->isAuthenticated) {
+            $this->webid           = $this->session->webid;
+            $this->isAuthenticated = $this->session->isAuthenticated;
+            $this->agent           = $this->session->agent;
             $this->authnDiagnostic = "Authenticated via a session";
 /*
             print "<pre>";
@@ -103,9 +105,9 @@ class Authentication {
          }
 
          if ($this->isAuthenticated)
-            $session->setAuthenticatedWebid($this->webid, $this->agent);
+            $this->session->setAuthenticatedWebid($this->webid, $this->agent);
          else
-            $session->unsetAuthenticatedWebid();
+            $this->session->unsetAuthenticatedWebid();
     }
 
     public function Authentication($ARCConfig, $sig = NULL) {
@@ -119,8 +121,7 @@ class Authentication {
     }
 
     public function logout() {
-        $session = new Authentication_Session();
-        $session->unsetAuthenticatedWebid();
+        $this->session->unsetAuthenticatedWebid();
     }
 }
 

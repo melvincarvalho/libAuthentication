@@ -29,18 +29,20 @@
 
 class Authentication_Session {
 
-    public $webid            =  NULL;
-    public $isAuthenticated = 0;
-    public $agent            = NULL;
+    public  $webid            =  NULL;
+    public  $isAuthenticated  = 0;
+    public  $agent            = NULL;
+
+    private $authnSession     = NULL;
 
     public function __construct($isAuthenticated = 0, $agent = NULL, $webid = NULL) {
-        $authnSession = session_name();
+        $this->authnSession = session_name();
 
-        if (isset($authnSession)) {
+        if (isset($this->authnSession)) {
             if (session_start()) {
                 $this->isAuthenticated = (isset($_SESSION['Authentication_isAuthenticated']))?$_SESSION['Authentication_isAuthenticated']:$isAuthenticated;
-                $this->webid = (isset($_SESSION['Authentication_webid']))?$_SESSION['Authentication_webid']:$webid;
-                $this->agent = (isset($_SESSION['Authentication_agent']))?$_SESSION['Authentication_agent']:$agent;
+                $this->webid           = (isset($_SESSION['Authentication_webid']))?$_SESSION['Authentication_webid']:$webid;
+                $this->agent           = (isset($_SESSION['Authentication_agent']))?$_SESSION['Authentication_agent']:$agent;
             }
         }
     }
@@ -53,28 +55,24 @@ class Authentication_Session {
 
     public function setAuthenticatedWebid($webid, $agent = NULL) {
         if (!is_null($webid)) {
-            $authnSession = session_name();
 
-            if (isset($authnSession)) {
-                if (session_start()) {
-                    $_SESSION['Authentication_isAuthenticated'] = 1;
-                    $_SESSION['Authentication_webid'] = $webid;
-                    $_SESSION['Authentication_agent'] = $agent;
-                }
-            }
+            $_SESSION['Authentication_isAuthenticated'] = 1;
+            $_SESSION['Authentication_webid']           = $webid;
+            $_SESSION['Authentication_agent']           = $agent;
+            $this->isAuthenticated = 1;
+            $this->webid           = $webid;
+            $this->agent           = $agent;
         }
     }
 
     public function unsetAuthenticatedWebid() {
-        $authnSession = session_name();
 
-        if (isset($authnSession)) {
-            if (session_start()) {
-                $_SESSION['Authentication_isAuthenticated'] = 0;
-                $_SESSION['Authentication_webid'] = NULL;
-                $_SESSION['Authentication_agent'] = NULL;
-            }
-        }
+        $_SESSION['Authentication_isAuthenticated'] = 0;
+        $_SESSION['Authentication_webid']           = NULL;
+        $_SESSION['Authentication_agent']           = NULL;
+        $this->isAuthenticated = 1;
+        $this->webid           = NULL;
+        $this->agent           = NULL;
     }
 }
 
