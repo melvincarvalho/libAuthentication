@@ -60,7 +60,7 @@ abstract class Authentication_FoafSSLAbstract {
 
             $this->opensslPkeyGetPublicHex();
             $this->opensslGetSubjectAltName();
-            $this->getAuth();
+            $this->getAuthentication();
 
         } else {
 
@@ -93,6 +93,11 @@ abstract class Authentication_FoafSSLAbstract {
 
     }
 
+    public function getAuth() {
+
+        return $this->isAuthenticated;
+
+    }
     /*  */
 
     /* Function to return the modulus and exponent of the supplied Client SSL Page */
@@ -119,7 +124,7 @@ abstract class Authentication_FoafSSLAbstract {
             //TODO: remove openssl dependency
             $RSAKey = `echo "$RSACert" | openssl asn1parse -inform PEM -i -strparse $RSAKeyOffset[0]`;
 
-            $RSAKeys = split("\n", $RSAKey);
+            $RSAKeys  = split("\n", $RSAKey);
             $modulus  = split(":", $RSAKeys[1]);
             $exponent = split(":", $RSAKeys[2]);
 
@@ -184,7 +189,7 @@ abstract class Authentication_FoafSSLAbstract {
     abstract protected function getAgentRSAKey();
     // A concrete class must implement this method to return an array of arrays containing the modulus and exponent keys for the referenced $this->webid
 
-    protected function getAuth() {
+    protected function getAuthentication() {
 
         if ( ($this->certModulus==NULL) || ($this->certExponent==NULL) ) {
 
@@ -194,28 +199,40 @@ abstract class Authentication_FoafSSLAbstract {
         }
         else {
 
-            $this->webid = $this->certSubjectAltName['URI'];
+            if ($san = $this->certSubjectAltName['URI'])
+                $this->webid = $san;
+            elseif ($san = $this->certSubjectAltName['DNS'])
+                $this->webid = 'http://' . $san /* 'webid4.me' */ ;
 
-            $agentRSAKey = $this->getAgentRSAKey();
+            if ($san) {
 
-            if ($agentRSAKey) {
+                $agentRSAKey = $this->getAgentRSAKey();
 
-                if ($this->equalRSAKeys($agentRSAKey)) {
+                if ($agentRSAKey) {
 
-                    $this->isAuthenticated = 1;
-                    $this->authnDiagnostic = 'Client Certificate RSAkey matches SAN RSAkey';
+                    if ($this->equalRSAKeys($agentRSAKey)) {
+
+                        $this->isAuthenticated = 1;
+                        $this->authnDiagnostic = 'Client Certificate RSAkey matches SAN RSAkey';
+
+                    } else {
+
+                        $this->isAuthenticated = 0;
+                        $this->authnDiagnostic = 'Client Certificate RSAkey does not match SAN RSAkey';
+
+                    }
 
                 } else {
 
                     $this->isAuthenticated = 0;
-                    $this->authnDiagnostic = 'Client Certificate RSAkey does not match SAN RSAkey';
+                    $this->authnDiagnostic = "No RSAKey found at supplied agent - $san";
 
                 }
 
             } else {
 
                 $this->isAuthenticated = 0;
-                $this->authnDiagnostic = 'No RSAKey found at supplied agent';
+                $this->authnDiagnostic = 'No SAN URI or DNS found in supplied certificate';
 
             }
 

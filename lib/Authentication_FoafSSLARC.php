@@ -74,10 +74,24 @@ class Authentication_FoafSSLARC extends Authentication_FoafSSLAbstract
     /* Returns an array of the modulus and exponent in the supplied RDF */
     protected function getFoafRSAKey() {
 
-        $modulus = NULL;
-        $exponent = NULL;
-        $res = NULL;
+        $modulus   = NULL;
+        $exponent  = NULL;
+        $res       = NULL;
+        $primaryId = $this->webid;
 
+        $q = 'PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+
+              SELECT ?x ?primaryTopic
+              WHERE {
+                      ?x foaf:primaryTopic ?primaryTopic .
+	            }';
+
+        if ($rows = $this->ARCStore->query($q, 'rows')) {
+            foreach ($rows as $row) {
+//                    print "primaryTopic " . $row['primaryTopic'] . "<br/>";
+                    $primaryId = $row['primaryTopic'];
+            }
+        }
 	/* list names */
         $q = " PREFIX cert: <http://www.w3.org/ns/auth/cert#>
                PREFIX rsa: <http://www.w3.org/ns/auth/rsa#>
@@ -94,7 +108,7 @@ class Authentication_FoafSSLARC extends Authentication_FoafSSLAbstract
  
             foreach ($rows as $row) {
 
-                if ($row['person']==$this->webid) {
+                if ($row['person']==$primaryId) {
 
                     if (isset($row['mod']))
                         $modulus =  $row['mod'];
@@ -106,8 +120,8 @@ class Authentication_FoafSSLARC extends Authentication_FoafSSLAbstract
                     elseif (isset($row['e']))
                         $exponent = $row['e'];
 
-                    $modulus =  Authentication_Helper::cleanHex($row['mod']);
-                    $exponent = Authentication_Helper::cleanHex($row['exp']);
+                    $modulus =  Authentication_Helper::cleanHex($modulus);
+                    $exponent = Authentication_Helper::cleanHex($exponent);
 
                     $res[] = array( 'modulus'=>$modulus, 'exponent'=>$exponent );
 

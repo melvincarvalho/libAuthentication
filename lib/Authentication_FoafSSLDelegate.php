@@ -148,9 +148,9 @@ class Authentication_FoafSSLDelegate {
         }
     }
 
-    public function Authentication_FoafSSLDelegate($sigAlg = 'rsa-sha1', $idpCertificate = 'foafssl.org-cert.pem', $https = NULL, $serverName = NULL, $serverPort = NULL, $requestURI = NULL, $referer = NULL, $error = NULL, $sig = NULL, $allowedTimeWindow = 300) {
+    public function Authentication_FoafSSLDelegate($createSession = TRUE, $sigAlg = 'rsa-sha1', $idpCertificate = 'foafssl.org-cert.pem', $https = NULL, $serverName = NULL, $serverPort = NULL, $requestURI = NULL, $referer = NULL, $error = NULL, $sig = NULL, $allowedTimeWindow = 300) {
 
-        $this->__construct($sigAlg, $idpCertificate, $https, $serverName, $serverPort, $requestURI, $referer, $error, $sig, $allowedTimeWindow);
+        $this->__construct($createSession, $sigAlg, $idpCertificate, $https, $serverName, $serverPort, $requestURI, $referer, $error, $sig, $allowedTimeWindow);
 
     }
 

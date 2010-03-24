@@ -113,7 +113,15 @@ class Authentication {
         $this->__construct($ARCConfig, $sig);
 
     }
-    
+
+    public function getAuth() {
+        return $this->isAuthenticated;
+    }
+
+    public function logout() {
+        $session = new Authentication_Session();
+        $session->unsetAuthenticatedWebid();
+    }
 }
 
 ?>
