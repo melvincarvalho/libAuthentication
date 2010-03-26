@@ -38,6 +38,21 @@ abstract class Authentication_AgentAbstract {
 
     public function __construct($agentURI) {
 
+        $this->setAgent($agentURI);
+    }
+
+    public function Authentication_AgentAbstract($agentURI) {
+
+        $this->__construct($agentURI);
+
+    }
+
+    public function getAgent() {
+        return $this->agent;
+    }
+
+    public function setAgent($agentURI) {
+
         if (isset($agentURI)) {
             $this->agentURI = $agentURI;
 
@@ -57,11 +72,6 @@ abstract class Authentication_AgentAbstract {
         {
             $this->errors = "No foaf file supplied";
         }
-    }
-
-    public function Authentication_AgentAbstract($agentURI) {
-
-        $this->__construct($agentURI);
 
     }
 
