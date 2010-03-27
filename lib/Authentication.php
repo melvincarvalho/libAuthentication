@@ -123,6 +123,10 @@ class Authentication {
     public function logout() {
         $this->session->unsetAuthenticatedWebid();
     }
+
+    public function getAgent() {
+        return $this->agent;
+    }
 }
 
 ?>
