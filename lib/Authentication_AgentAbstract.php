@@ -36,10 +36,26 @@ abstract class Authentication_AgentAbstract {
     public $agentId  = NULL;
     public $agent    = NULL;
 
-    public function __construct($agentURI) {
+    public function __construct($agentURI = NULL) {
+
+        $this->setAgent($agentURI);
+    }
+
+    public function Authentication_AgentAbstract($agentURI = NULL) {
+
+        $this->__construct($agentURI);
+
+    }
+
+    public function getAgent() {
+        return $this->agent;
+    }
+
+    public function setAgent($agentURI) {
 
         if (isset($agentURI)) {
             $this->agentURI = $agentURI;
+            $this->errors = NULL;
 
             if (Authentication_Helper::isValidUrl($agentURI)) {
                 $this->loadAgent();
@@ -49,20 +65,18 @@ abstract class Authentication_AgentAbstract {
                     $this->agent = $this->getAgentProperties();
                 }
             }
-            else
+            else {
                 $this->errors = "Invalid foaf file supplied";
-
+                return(FALSE);
+            }
         }
         else
         {
             $this->errors = "No foaf file supplied";
+            return FALSE;
         }
-    }
 
-    public function Authentication_AgentAbstract($agentURI) {
-
-        $this->__construct($agentURI);
-
+        return TRUE;
     }
 
     abstract function loadAgent();

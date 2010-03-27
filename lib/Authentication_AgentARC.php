@@ -35,7 +35,7 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
     private $ARCConfig = NULL;
     private $ARCStore  = NULL;
 
-    public function __construct($ARCConfig, $agentURI, $ARCStore = NULL) {
+    public function __construct($ARCConfig, $agentURI = NULL, $ARCStore = NULL) {
 
         $this->ARCConfig = $ARCConfig;
         $this->ARCStore  = $ARCStore;
@@ -43,16 +43,15 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
         parent::__construct($agentURI);
     }
 
-    public function Authentication_AgentARC($ARCConfig, $agentURI, $ARCStore = NULL) {
+    public function Authentication_AgentARC($ARCConfig, $agentURI = NULL, $ARCStore = NULL) {
 
-        $this->__construct($ARCConfig, $ARCStore, $agentURI);
+        $this->__construct($ARCConfig, $agentURI, $ARCStore);
 
     }
 
 
     public function loadAgent() {
 
-        if (!isset($this->ARCStore))
             $this->createStore();
 
     }
@@ -101,22 +100,24 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
 
     private function createStore() {
 
-        $store = ARC2::getStore($this->ARCConfig);
+        if (!isset($this->ARCStore)) {
 
-        if (!$store->isSetUp()) {
-            $store->setUp();
+            $store = ARC2::getStore($this->ARCConfig);
+
+            if (!$store->isSetUp()) {
+                $store->setUp();
+            }
+
+            $this->ARCStore = $store;
         }
 
-        $store->reset();
+        $this->ARCStore->reset();
 
         /* LOAD will call the Web reader, which will call the
 	   format detector, which in turn triggers the inclusion of an
 	   appropriate parser, etc. until the triples end up in the store. */
-        $store->query('LOAD <'.$this->agentURI.'>');
+        $this->ARCStore->query('LOAD <'.$this->agentURI.'>');
 
-        $this->ARCStore = $store;
-
-        return $store;
     }
 
     /* Returns an array of the modulus and exponent in the supplied RDF */
