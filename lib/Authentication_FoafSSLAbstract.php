@@ -27,8 +27,8 @@
 //
 //-----------------------------------------------------------------------------------------------------------------------------------
 
-require_once("lib/Authentication_Helper.php");
-require_once("lib/Authentication_Session.php");
+require_once(dirname(__FILE__)."/Authentication_Helper.php");
+require_once(dirname(__FILE__)."/Authentication_Session.php");
 
 abstract class Authentication_FoafSSLAbstract {
 

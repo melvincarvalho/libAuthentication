@@ -26,98 +26,119 @@
 // -- Albert Einstein
 //
 //-----------------------------------------------------------------------------------------------------------------------------------
-require_once("lib/Authentication_Session.php");
-
+require_once(dirname(__FILE__)."/Authentication_Url.php");
+require_once(dirname(__FILE__)."/Authentication_X509CertRepo.php");
+require_once(dirname(__FILE__)."/Authentication_Session.php");
+/**
+ * Implements FoafSSL Authentication using an Identity Provider
+ *
+ * @author Akbar Hossain
+ */
 class Authentication_FoafSSLDelegate {
 
     public  $webid             = NULL;
     public  $isAuthenticated   = 0;
     public  $authnDiagnostic   = NULL;
     private $requestURI        = NULL;
+    /** instance of Authentication_Url */
     private $referer           = NULL;
     private $ts                = NULL;
     private $allowedTimeWindow = 0;
     private $elapsedTime       = 0;
 
-    public function __construct($createSession = TRUE, $sigAlg = 'rsa-sha1', $idpCertificate = 'foafssl.org-cert.pem', $https = NULL, $serverName = NULL, $serverPort = NULL, $requestURI = NULL, $referer = NULL, $error=NULL, $sig = NULL, $webid = NULL, $ts = NULL, $allowedTimeWindow = 300) {
+    const STATUS_AUTH_VIA_SESSION = "Authenticated via a session";
+    const STATUS_DELEGATED_LOGIN_OK = "Delegated FOAF Login response has been authenticated";
+    const STATUS_SIGNATURE_VERIFICATION_ERR = "Signature on response could not be verified";
+    const STATUS_UNSUPPORTED_SIGNATURE_ALG_ERR = "Unsupported signature algorithm";
+    const STATUS_IDP_RESPONSE_TIMEOUT_ERR = "Response from delegate IdP was outside of the allowed time window";
 
+    const SIG_ALG_RSA_SHA1 = 'rsa-sha1';
+    /**
+     * Perform delegated FOAF+SSL authentication relying on an Identity Provider
+     * @param Authentication_SignedUrl $request (if not specified infered from _GET)
+     * @param Authentication_X509CertRepo $certRepository (if not default is used)
+     * @param bool $createSession
+     * @param string $sigAlg
+     * @param int $allowedTimeWindow
+     */
+    public function __construct(Authentication_SignedUrl $request = NULL,
+                                Authentication_X509CertRepo $certRepository = NULL,
+                                $createSession = TRUE,
+                                $sigAlg = self::SIG_ALG_RSA_SHA1,
+                                $allowedTimeWindow = 300)
+    {
         if ($createSession) {
             $session = new Authentication_Session();
             if ($session->isAuthenticated) {
                 $this->webid = $session->webid;
                 $this->isAuthenticated = $session->isAuthenticated;
-                $this->authnDiagnostic = "Authenticated via a session";
+                $this->authnDiagnostic = self::STATUS_AUTH_VIA_SESSION;
                 return;
             }
         }
 
-        $requestURI = isset($requestURI)?$requestURI:$_SERVER["REQUEST_URI"];
-        $https = isset($https)?$https:$_SERVER["HTTPS"];
-        $serverName = isset($serverName)?$serverName:$_SERVER["SERVER_NAME"];
-        $serverPort = isset($serverPort)?$serverPort:$_SERVER["SERVER_PORT"];
-        $referer = isset($referer)?$referer:$_GET["referer"];
-        $error = isset($error)?$error:$_GET["error"];
-        $sig = isset($sig)?$sig:$_GET["sig"];
-        $webid = isset($webid)?$webid:$_GET["webid"];
-        $ts = isset($ts)?$ts:$_GET["ts"];
+        if (!$certRepository)
+            $certRepository = new Authentication_X509CertRepo();
 
-        $this->requestURI        = $requestURI;
-        $this->referer           = $referer;
+        if (!$request) {
+            $request = Authentication_SignedUrl::parse(
+                    ((isset($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"] == "on")) ? "https" : "http")
+                    . "://".$_SERVER["SERVER_NAME"]
+                    . ($_SERVER["SERVER_PORT"] != ((isset($_SERVER["HTTPS"])
+                         && ($_SERVER["HTTPS"] == "on")) ? 443 : 80) ? ":"
+                            .$_SERVER["SERVER_PORT"] : "")
+                    . $_SERVER["REQUEST_URI"]
+                    );
+        }
+
+        $error = $request->getQueryParameter('error', $_GET["error"]);
+        $sig = $request->getQueryParameter('sig', $_GET["sig"]);
+        $ts = $request->getQueryParameter('ts', $_GET["ts"]);
+
+        $this->requestURI        = $request;
+        $this->referer           = Authentication_Url::parse( 
+                                    $request->getQueryParameter('referer', $_GET["referer"]));
         $this->ts                = $ts;
-        $this->webid             = $webid;
+        $this->webid             = $request->getQueryParameter('webid', $_GET["webid"]);
         $this->allowedTimeWindow = $allowedTimeWindow;
 
         $this->elapsedTime = time() - strtotime($ts);
 
-        if (isset($this->referer)) {
-
-		$split  = preg_split('/\//', $this->referer);
-                
-                $idpCertificate = $split[2] . "-cert.pem";
-        }
-
-
+        /*
+         * Loads the trusted certificate of the IdP: its public key is used to
+         * verify the integrity of the signed assertion.
+         */
+        $idpCertificate = $certRepository->getIdpCertificate($this->referer->host);
         if ( ($this->elapsedTime < $this->allowedTimeWindow) && (!isset($error)) ) {
 
-            /* Reconstructs the signed message: the URI except the 'sig' parameter */
-            $fullURI = ((isset($https) && ($https == "on")) ? "https" : "http")
-                    . "://" . $serverName
-                    . ($serverPort != ((isset($https) && ($https == "on")) ? 443 : 80) ? ":".$serverPort : "")
-                    . $requestURI;
+            $signedInfo = $this->requestURI->urlWithoutSignature();
 
-            $signedInfo = substr($fullURI, 0, -5-strlen(urlencode(isset($sig) ? $sig : NULL)));
+            // Extracts the signature
+            $signature = $this->requestURI->digitalSignature();
+            // TODO this may be removed in the future
+            if (!$signature)
+                $signature = $sig;
 
-            /* Extracts the signature */
-            $signature = base64_decode(isset($sig) ? $sig : NULL);
+            // Only rsa-sha1 is supported at the moment.
+            if ($sigAlg == self::SIG_ALG_RSA_SHA1) {
+                if ($idpCertificate) {
+                    $pubKeyId = openssl_get_publickey($idpCertificate);
 
-            /* Only rsa-sha1 is supported at the moment. */
-            if ($sigAlg == "rsa-sha1") {
-                /*
-                 * Loads the trusted certificate of the IdP: its public key is used to
-                 * verify the integrity of the signed assertion.
-                */
-                $fp   = fopen($idpCertificate, "r");
-                if ($fp != FALSE) {
-                    $cert = fread($fp, 8192);
-                    fclose($fp);
-
-                    $pubKeyId = openssl_get_publickey($cert);
-
-                    /* Verifies the signature */
+                    // Verifies the signature
                     $verified = openssl_verify($signedInfo, $signature, $pubKeyId);
                     if ($verified == 1) {
                         // The verification was successful.
                         $this->isAuthenticated = 1;
-                        $this->authnDiagnostic = "Delegated FOAF Login response has been authenticated";
+                        $this->authnDiagnostic = self::STATUS_DELEGATED_LOGIN_OK;
                     }
                     elseif ($verified == 0) {
                         // The signature didn't match.
                         $this->isAuthenticated = 0;
-                        $this->authnDiagnostic = "Signature on response could not be verified";
+                        $this->authnDiagnostic = self::STATUS_SIGNATURE_VERIFICATION_ERR;
                     } else {
                         // Error during the verification.
                         $this->isAuthenticated = 0;
-                        $this->authnDiagnostic = "Signature on response could not be verified";
+                        $this->authnDiagnostic = self::STATUS_SIGNATURE_VERIFICATION_ERR;
                     }
 
                     openssl_free_key($pubKeyId);
@@ -129,7 +150,7 @@ class Authentication_FoafSSLDelegate {
             } else {
                 // Unsupported signature algorithm.
                 $this->isAuthenticated = 0;
-                $this->authnDiagnostic = "Unsupported signature algorithm";
+                $this->authnDiagnostic = self::STATUS_UNSUPPORTED_SIGNATURE_ALG_ERR;
             }
         }
         else {
@@ -137,7 +158,7 @@ class Authentication_FoafSSLDelegate {
             if (isset($error))
                 $this->authnDiagnostic = $error;
             else
-                $this->authnDiagnostic = "Response from delegate IdP was outside of the allowed time window";
+                $this->authnDiagnostic = self::STATUS_IDP_RESPONSE_TIMEOUT_ERR;
         }
 
         if ($createSession) {
@@ -148,10 +169,13 @@ class Authentication_FoafSSLDelegate {
         }
     }
 
-    public function Authentication_FoafSSLDelegate($createSession = TRUE, $sigAlg = 'rsa-sha1', $idpCertificate = 'foafssl.org-cert.pem', $https = NULL, $serverName = NULL, $serverPort = NULL, $requestURI = NULL, $referer = NULL, $error = NULL, $sig = NULL, $allowedTimeWindow = 300) {
-
-        $this->__construct($createSession, $sigAlg, $idpCertificate, $https, $serverName, $serverPort, $requestURI, $referer, $error, $sig, $allowedTimeWindow);
-
+    public function Authentication_FoafSSLDelegate(
+                                Authentication_SignedUrl $request,
+                                Authentication_X509CertRepo $certRepository,
+                                $createSession = TRUE,
+                                $sigAlg = self::SIG_ALG_RSA_SHA1,
+                                $allowedTimeWindow = 300) {
+        $this->__construct($request,$certRepository,$createSession,$sigAlg,$allowedTimeWindow);
     }
 
 }

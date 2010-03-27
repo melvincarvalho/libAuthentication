@@ -1,4 +1,31 @@
 <?php
+//-----------------------------------------------------------------------------------------------------------------------------------
+//
+// Filename   : Authentication_Helper_Spec.php
+// Date       : 26th Mar 2010
+//
+// See Also   : https://foaf.me/testLibAuthentication.php
+//
+// Copyright 2008-2010 foaf.me
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// "Everything should be made as simple as possible, but no simpler."
+// -- Albert Einstein
+//
+//-----------------------------------------------------------------------------------------------------------------------------------
+
 require_once 'PHPUnit/Framework.php';
 require_once dirname(__FILE__).'/../lib/Authentication_Helper.php';
 
@@ -23,8 +50,8 @@ class AuthenticationHelperTest extends PHPUnit_Framework_TestCase
     {
         return array(
           array('345af', '345AF', 'Uppercase conversion'),
-          array('23:54:23:af:44','235423AF44','Delimiters are removed' ),
-          array('23-54-23-af-44','235423AF44','Delimiters are removed' ),
+          array('23:54:23:af:44','235423AF44','Characters other than 0..9, a..f, A..F are removed' ),
+          array('23-54-23-af-44','235423AF44','Characters other than 0..9, a..f, A..F are removed' ),
           array('002354023af44','2354023AF44','Leading zeros are removed' )
         );
     }
@@ -80,30 +107,30 @@ class AuthenticationHelperTest extends PHPUnit_Framework_TestCase
         return array(
             array(NULL, array('x'), array('x'),'first array can be null'),
             array(array('x'), NULL, array('x'),'second array can be null'),
-            array(array('x' => '0'), array('y' => "1"), array('x'=>'0','y'=>'1'), 'elements of arrays are merged'),
-            array(array('x' => '0'), array('x' => "1"), array('x'=>'1'), 'elements of arr2 override elements arr1')
+            array(array('x' => '0'), array('y' => "1"), array_merge(array('x' => '0'), array('y' => "1")),
+                'elements of arrays are merged as with array_merge'),
+            array(array('x' => '0'), array('x' => "1"), array_merge(array('x' => '0'), array('x' => "1")),
+                'elements of arr2 override elements arr1 as with array_merge')
         );
     }
 
     /**
      * @test
-     * @dataProvider arraysToMerge
      */
-    public function arrayUnique_removes_duplicate_elements_from_nested_arrays
-    (
-      $input_arr,$expected_output_arr,$comment
-    )
+    public function arrayUnique_removes_duplicate_values_from_multidimensional_arrays()
     {
-        $this->assertEquals($expected_output_arr, Authentication_Helper::arrayUnique($input_arr),$comment);
+       // $this->assertEquals(array(array('key' => 0)), Authentication_Helper::arrayUnique(array(array('key'=> 0),array('key'=> 1))), $comment);
     }
 
     public function arraysWithDuplicateElements()
     {
         return array(
-            array(array('x','x'), array('x'),'Remove simple duplicate entries'),
-            array(array('x', array('x', 'y')), array('x','y'),'')
+                array('not an array', 'not an array', 'Non-array instances are returned unchanged'),
+                array(array(array('key'=> 0),array('key'=> 1)), array(array('key' => 0)),'duplicate keys are removed'),
+                array(array(array('key'=> array('nested_key'=> 2)),array('key2'=> array('nested_key'=> 3))),
+                        array(array('key' => 0)),'duplicate keys are removed')
 
-        );
+            );
     }
 }
 

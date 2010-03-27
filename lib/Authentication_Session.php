@@ -26,7 +26,11 @@
 // -- Albert Einstein
 //
 //-----------------------------------------------------------------------------------------------------------------------------------
-
+/**
+ * Persist authentication information in the session storage
+ *
+ * @author Akbar Hossain
+ */
 class Authentication_Session {
 
     public  $webid            =  NULL;
@@ -35,14 +39,24 @@ class Authentication_Session {
 
     private $authnSession     = NULL;
 
+    const IS_AUTHENTICATED = 'Authentication_isAuthenticated';
+    const AGENT = 'Authentication_webid';
+    const WEBID = 'Authentication_agent';
+
+    /**
+     * Created FOAF+SSL authenticated session
+     * @param int $isAuthenticated
+     * @param mixed $agent
+     * @param string $webid
+     */
     public function __construct($isAuthenticated = 0, $agent = NULL, $webid = NULL) {
         $this->authnSession = session_name();
 
         if (isset($this->authnSession)) {
             if (session_start()) {
-                $this->isAuthenticated = (isset($_SESSION['Authentication_isAuthenticated']))?$_SESSION['Authentication_isAuthenticated']:$isAuthenticated;
-                $this->webid           = (isset($_SESSION['Authentication_webid']))?$_SESSION['Authentication_webid']:$webid;
-                $this->agent           = (isset($_SESSION['Authentication_agent']))?$_SESSION['Authentication_agent']:$agent;
+                $this->isAuthenticated = (isset($_SESSION[self::IS_AUTHENTICATED]))?$_SESSION[self::IS_AUTHENTICATED]:$isAuthenticated;
+                $this->webid           = (isset($_SESSION[self::AGENT]))?$_SESSION[self::AGENT]:$webid;
+                $this->agent           = (isset($_SESSION[self::WEBID]))?$_SESSION[self::WEBID]:$agent;
             }
         }
     }
@@ -52,24 +66,30 @@ class Authentication_Session {
         $this->__construct($isAuthenticated, $agent, $webid);
 
     }
-
+    /**
+     * Set an authenticated webid
+     * @param mixed $webid
+     * @param mixed $agent
+     */
     public function setAuthenticatedWebid($webid, $agent = NULL) {
         if (!is_null($webid)) {
 
-            $_SESSION['Authentication_isAuthenticated'] = 1;
-            $_SESSION['Authentication_webid']           = $webid;
-            $_SESSION['Authentication_agent']           = $agent;
+            $_SESSION[self::IS_AUTHENTICATED] = 1;
+            $_SESSION[self::AGENT]           = $webid;
+            $_SESSION[self::WEBID]           = $agent;
             $this->isAuthenticated = 1;
             $this->webid           = $webid;
             $this->agent           = $agent;
         }
     }
-
+    /**
+     * Unset authenticated webid for current session
+     */
     public function unsetAuthenticatedWebid() {
 
-        $_SESSION['Authentication_isAuthenticated'] = 0;
-        $_SESSION['Authentication_webid']           = NULL;
-        $_SESSION['Authentication_agent']           = NULL;
+        $_SESSION[self::IS_AUTHENTICATED] = 0;
+        $_SESSION[self::AGENT]           = NULL;
+        $_SESSION[self::WEBID]           = NULL;
         $this->isAuthenticated = 1;
         $this->webid           = NULL;
         $this->agent           = NULL;

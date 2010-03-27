@@ -26,6 +26,8 @@
 // -- Albert Einstein
 //
 //-----------------------------------------------------------------------------------------------------------------------------------
+require_once dirname(__FILE__).'/Authentication_Url.php';
+
 /**
  * Collection of utility functions
  */
@@ -53,24 +55,16 @@ class Authentication_Helper {
      * @return bool TRUE, if the URL was succesfully resolved and returned HTTP 200 | 301 | 302
      */
     public static function isValidUrl ( $url, $getHeadersFunc = 'get_headers' ) {
-        $url = @parse_url($url);
-        
+        $Url = Authentication_Url::parse($url);
+
         if ( ! $url ) {
             return false;
         }
         
-        $url = array_map('trim', $url);
-        $url['port'] = (!isset($url['port'])) ? 80 : (int)$url['port'];
-        $path = (isset($url['path'])) ? $url['path'] : '';
-        
-        if ($path == '') {
-            $path = '/';
-        }
-        
-        $path .= ( isset ( $url['query'] ) ) ? "?$url[query]" : '';
-        
-        if ( isset($url['host']) AND isset($url['scheme']) AND ( ($url['scheme']=='http') OR ($url['scheme']=='https') ) AND ($url['host']!=gethostbyname($url['host'])) ) {
-            $headers = $getHeadersFunc("$url[scheme]://$url[host]:$url[port]$path");
+        if ( ($Url->scheme == 'http') || ($Url->scheme=='https')
+          && ($Url->host != gethostbyname($Url->host)) )
+        {
+            $headers = $getHeadersFunc(sprintf("%s",$url));
             $headers = ( is_array ( $headers ) ) ? implode ( "\n", $headers ) : $headers;
             return ( bool ) preg_match ( '#^HTTP/.*\s+[(200|301|302)]+\s#i', $headers );
         }
@@ -94,7 +88,10 @@ class Authentication_Helper {
     }
 
     /**
-     * This function removes duplicated entries within nested arrays
+     * This function removes duplicate values from multidimensional arrays
+     *
+     * Note: This is to amend the standard array_unique() function
+     *       to handle nested arrays
      * @param array $myarray
      * @return array Result clean of all duplicate entries
      */

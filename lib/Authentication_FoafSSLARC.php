@@ -27,9 +27,9 @@
 //
 //-----------------------------------------------------------------------------------------------------------------------------------
 
-require_once("arc/ARC2.php");
-require_once("lib/Authentication_Helper.php");
-require_once("lib/Authentication_FoafSSLAbstract.php");
+require_once(dirname(__FILE__)."/../arc/ARC2.php");
+require_once(dirname(__FILE__)."/Authentication_Helper.php");
+require_once(dirname(__FILE__)."/Authentication_FoafSSLAbstract.php");
 
 class Authentication_FoafSSLARC extends Authentication_FoafSSLAbstract
 {

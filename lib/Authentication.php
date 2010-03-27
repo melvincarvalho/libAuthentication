@@ -27,9 +27,9 @@
 //
 //-----------------------------------------------------------------------------------------------------------------------------------
 
-require_once("lib/Authentication_FoafSSLDelegate.php");
-require_once("lib/Authentication_FoafSSLARC.php");
-require_once("lib/Authentication_AgentARC.php");
+require_once(dirname(__FILE__)."/Authentication_FoafSSLDelegate.php");
+require_once(dirname(__FILE__)."/Authentication_FoafSSLARC.php");
+require_once(dirname(__FILE__)."/Authentication_AgentARC.php");
 
 class Authentication {
 

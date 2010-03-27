@@ -1,6 +1,7 @@
 php unit tests
 
 1. Make sure have phpunit installed (http://www.phpunit.de/manual/current/en/installation.html)
-2. Run any test by issuing
+2. Run a single test case by issuing
     phpunit SomeTest.php
-3. Running the whole test suite with a single command will be supported soon...
+3. Running the whole test suit by issuing
+    phpunit tests

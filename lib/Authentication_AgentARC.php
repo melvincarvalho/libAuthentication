@@ -27,8 +27,8 @@
 //
 //-----------------------------------------------------------------------------------------------------------------------------------
 
-require_once("arc/ARC2.php"); 
-require_once("lib/Authentication_AgentAbstract.php");
+require_once(dirname(__FILE__)."/../arc/ARC2.php");
+require_once(dirname(__FILE__)."/Authentication_AgentAbstract.php");
 
 class Authentication_AgentARC extends Authentication_AgentAbstract {
 
