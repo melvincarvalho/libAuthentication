@@ -32,6 +32,7 @@
  */
 class Authentication_X509CertRepo
 {
+    const DEFAULT_IDP = 'foafssl.org';
     private $idpCertificateDir;
 
     /**
@@ -52,7 +53,10 @@ class Authentication_X509CertRepo
     public function getIdpCertificate($idpDomainName)
     {
         $certificateContent = NULL;
-        if (file_exists(dirname($this->idpCertificateDir).'/'.$idpDomainName.'-cert.pem'))
+        $filename = dirname($this->idpCertificateDir).'/'.
+                    ($idpDomainName ? $idpDomainName : self::DEFAULT_IDP)
+                    .'-cert.pem';
+        if (file_exists($filename))
                 $certificateContent = file_get_contents(
                           $filename, NULL, NULL, 0, 8192);
 
