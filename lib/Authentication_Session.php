@@ -61,11 +61,6 @@ class Authentication_Session {
         }
     }
 
-    public function Authentication_Session($isAuthenticated = 0, $agent = NULL, $webid = NULL) {
-
-        $this->__construct($isAuthenticated, $agent, $webid);
-
-    }
     /**
      * Set an authenticated webid
      * @param mixed $webid

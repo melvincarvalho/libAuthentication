@@ -61,9 +61,9 @@ class Authentication_FoafSSLDelegate {
      * @param string $sigAlg
      * @param int $allowedTimeWindow
      */
-    public function __construct(Authentication_SignedUrl $request = NULL,
+    public function __construct($createSession = TRUE,
+                                Authentication_SignedUrl $request = NULL,
                                 Authentication_X509CertRepo $certRepository = NULL,
-                                $createSession = TRUE,
                                 $sigAlg = self::SIG_ALG_RSA_SHA1,
                                 $allowedTimeWindow = 300)
     {
@@ -167,15 +167,6 @@ class Authentication_FoafSSLDelegate {
             else
                 $session->unsetAuthenticatedWebid();
         }
-    }
-
-    public function Authentication_FoafSSLDelegate(
-                                Authentication_SignedUrl $request,
-                                Authentication_X509CertRepo $certRepository,
-                                $createSession = TRUE,
-                                $sigAlg = self::SIG_ALG_RSA_SHA1,
-                                $allowedTimeWindow = 300) {
-        $this->__construct($request,$certRepository,$createSession,$sigAlg,$allowedTimeWindow);
     }
 
 }
