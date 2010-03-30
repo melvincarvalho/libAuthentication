@@ -100,7 +100,7 @@ class Authentication_SignedUrl extends Authentication_Url
     }
     public function urlWithoutSignature()
     {
-        return substr($this->__toString(), 0, -5-strlen(urlencode(isset($sig) ? $sig : NULL)));
+        return substr($this->parsedUrl, 0, -5-strlen(urlencode(isset($sig) ? $sig : NULL)));
     }
     public static function parse($url_string)
     {
