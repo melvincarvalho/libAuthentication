@@ -332,9 +332,12 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
                         $webid[$key] = $row['webid'];
                     }
 
-                    $name_lowercase = array_map('strtolower', $name);
+                    if (is_array($name))
+                    {
+                        $name_lowercase = array_map('strtolower', $name);
 
-                    array_multisort($name_lowercase, SORT_ASC, SORT_STRING, $results);
+                        array_multisort($name_lowercase, SORT_ASC, SORT_STRING, $results);
+                    }
                 }
             }
         }
