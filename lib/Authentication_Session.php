@@ -55,8 +55,8 @@ class Authentication_Session {
         if (isset($this->authnSession)) {
             if (session_start()) {
                 $this->isAuthenticated = (isset($_SESSION[self::IS_AUTHENTICATED]))?$_SESSION[self::IS_AUTHENTICATED]:$isAuthenticated;
-                $this->webid           = (isset($_SESSION[self::AGENT]))?$_SESSION[self::AGENT]:$webid;
-                $this->agent           = (isset($_SESSION[self::WEBID]))?$_SESSION[self::WEBID]:$agent;
+                $this->webid           = (isset($_SESSION[self::WEBID]))?$_SESSION[self::WEBID]:$webid;
+                $this->agent           = (isset($_SESSION[self::AGENT]))?$_SESSION[self::AGENT]:$agent;
             }
         }
     }
@@ -68,10 +68,10 @@ class Authentication_Session {
      */
     public function setAuthenticatedWebid($webid, $agent = NULL) {
         if (!is_null($webid)) {
-
             $_SESSION[self::IS_AUTHENTICATED] = 1;
-            $_SESSION[self::AGENT]           = $webid;
-            $_SESSION[self::WEBID]           = $agent;
+            $_SESSION[self::WEBID]            = $webid;
+            $_SESSION[self::AGENT]            = $agent;
+
             $this->isAuthenticated = 1;
             $this->webid           = $webid;
             $this->agent           = $agent;
@@ -81,10 +81,10 @@ class Authentication_Session {
      * Unset authenticated webid for current session
      */
     public function unsetAuthenticatedWebid() {
-
         $_SESSION[self::IS_AUTHENTICATED] = 0;
-        $_SESSION[self::AGENT]           = NULL;
-        $_SESSION[self::WEBID]           = NULL;
+        $_SESSION[self::AGENT]            = NULL;
+        $_SESSION[self::WEBID]            = NULL;
+
         $this->isAuthenticated = 1;
         $this->webid           = NULL;
         $this->agent           = NULL;
