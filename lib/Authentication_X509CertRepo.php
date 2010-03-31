@@ -33,34 +33,42 @@
 class Authentication_X509CertRepo
 {
     const DEFAULT_IDP = 'foafssl.org';
-    private $idpCertificateDir;
+    
+    private $IDPCertificates = array ( self::DEFAULT_IDP =>
+"-----BEGIN CERTIFICATE-----
+MIIDQzCCAqygAwIBAgIDC3vTMA0GCSqGSIb3DQEBBQUAMFoxCzAJBgNVBAYTAlVT
+MRwwGgYDVQQKExNFcXVpZmF4IFNlY3VyZSBJbmMuMS0wKwYDVQQDEyRFcXVpZmF4
+IFNlY3VyZSBHbG9iYWwgZUJ1c2luZXNzIENBLTEwHhcNMDkwNTAyMDk0NjUyWhcN
+MTAwNjAyMDk0NjUyWjCBsjELMAkGA1UEBhMCRlIxFDASBgNVBAoTC2ZvYWZzc2wu
+b3JnMRMwEQYDVQQLEwpHVDI4MTEzNDQ2MTEwLwYDVQQLEyhTZWUgd3d3LnJhcGlk
+c3NsLmNvbS9yZXNvdXJjZXMvY3BzIChjKTA5MS8wLQYDVQQLEyZEb21haW4gQ29u
+dHJvbCBWYWxpZGF0ZWQgLSBSYXBpZFNTTChSKTEUMBIGA1UEAxMLZm9hZnNzbC5v
+cmcwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAJ8mIxypIeBmITFG64JczdHh
+kyIe6GdPdZzyhsVbVbBwJeAnXLuDBe6T+2A1alMuw6zaguUsb4fwN5oNDUaBxzqP
+kLJGftZU4+V/Q6+O3RPXILd5/b/fJgKPcb9jCliMzao1o1IsmY6lfp8vx3QvRB7g
+cOtCYZyROjQz8iIHFwABAgMBAAGjgb0wgbowDgYDVR0PAQH/BAQDAgTwMB0GA1Ud
+DgQWBBRecxqmtOkjohLmNbyY7QyunrETajA7BgNVHR8ENDAyMDCgLqAshipodHRw
+Oi8vY3JsLmdlb3RydXN0LmNvbS9jcmxzL2dsb2JhbGNhMS5jcmwwHwYDVR0jBBgw
+FoAUvqigdHJQa0S3ySPY+6j/s1draGwwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsG
+AQUFBwMCMAwGA1UdEwEB/wQCMAAwDQYJKoZIhvcNAQEFBQADgYEAHz0k4c+sGNu1
+Z/JWtoWOo8m4h4fFLFVn2nMur4fC7uKJCS/uUmqrPY3kNCs36Sn9yy6Ek+RMJNnm
+9ctec/tRLIQt2pi5M/6A+1so6CDw1gzAGcLlKzzcgU0nI2u3CuyX22VPbeAi21vI
+04BmchTSfqsZRx0rzIlznBSVp+4V17I=
+-----END CERTIFICATE-----
+");
 
-    /**
-     * Initialize X509 certificate
-     * @param $idpCertificateDir Path to the directory containing idp certificates
-     *
-     */
-    public function __construct($idpCertificateDir = '.')
-    {
-        $this->idpCertificateDir = $idpCertificateDir;
-        
-    }
     /**
      * Get the Identity Provider's certificate
-     * @param string $idpDomainName Identity Provider's domain name (e.g. foafssl.org)
-     * @return object This instance
+     * @param string $IPDDomainName Identity Provider's domain name
+     *        (e.g. foafssl.org)
+     * @return object requiested x509 certificate content
+     *         (or the default IDP's certificate, if the requested is not found)
      */
-    public function getIdpCertificate($idpDomainName)
+    public function getIdpCertificate($IDPDomainName)
     {
-        $certificateContent = NULL;
-        $filename = dirname($this->idpCertificateDir).'/'.
-                    ($idpDomainName ? $idpDomainName : self::DEFAULT_IDP)
-                    .'-cert.pem';
-        if (file_exists($filename))
-                $certificateContent = file_get_contents(
-                          $filename, NULL, NULL, 0, 8192);
-
-        return $certificateContent;
+       return isset($this->IDPCertificates[$IDPDomainName]) ?
+               $this->IDPCertificates[$IDPDomainName]
+              : $this->IDPCertificates[self::DEFAULT_IDP];
     }
 }
 ?>
