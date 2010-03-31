@@ -57,7 +57,7 @@ abstract class Authentication_AgentAbstract {
             $this->agentURI = $agentURI;
             $this->errors = NULL;
 
-            if (Authentication_Helper::isValidUrl($agentURI)) {
+            if (Authentication_Helper::isValidURL($agentURI)) {
                 $this->loadAgent();
                 $this->loadErrors();
                 if (!isset($this->errors)) {

@@ -26,7 +26,7 @@
 // -- Albert Einstein
 //
 //-----------------------------------------------------------------------------------------------------------------------------------
-require_once dirname(__FILE__).'/Authentication_Url.php';
+require_once dirname(__FILE__).'/Authentication_URL.php';
 
 /**
  * Collection of utility functions
@@ -54,15 +54,15 @@ class Authentication_Helper {
      * @param string $getHeadersFunc The function that gets the HTTP response header for the URL
      * @return bool TRUE, if the URL was succesfully resolved and returned HTTP 200 | 301 | 302
      */
-    public static function isValidUrl ( $url, $getHeadersFunc = 'get_headers' ) {
-        $Url = Authentication_Url::parse($url);
+    public static function isValidURL ( $url, $getHeadersFunc = 'get_headers' ) {
+        $URL = Authentication_URL::parse($url);
 
         if ( ! $url ) {
             return false;
         }
         
-        if ( ($Url->scheme == 'http') || ($Url->scheme=='https')
-          && ($Url->host != gethostbyname($Url->host)) )
+        if ( ($URL->scheme == 'http') || ($URL->scheme=='https')
+          && ($URL->host != gethostbyname($URL->host)) )
         {
             $headers = $getHeadersFunc(sprintf("%s",$url));
             $headers = ( is_array ( $headers ) ) ? implode ( "\n", $headers ) : $headers;

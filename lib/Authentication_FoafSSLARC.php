@@ -52,7 +52,7 @@ class Authentication_FoafSSLARC extends Authentication_FoafSSLAbstract
 
     private function createStore() {
 
-        if ( (!isset($this->ARCStore)) && (Authentication_Helper::isValidUrl($this->webid)) ) {
+        if ( (!isset($this->ARCStore)) && (Authentication_Helper::isValidURL($this->webid)) ) {
 
             $store = ARC2::getStore($this->ARCConfig);
 

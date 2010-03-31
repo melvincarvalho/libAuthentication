@@ -26,7 +26,7 @@
 // -- Albert Einstein
 //
 //-----------------------------------------------------------------------------------------------------------------------------------
-require_once(dirname(__FILE__)."/Authentication_Url.php");
+require_once(dirname(__FILE__)."/Authentication_URL.php");
 require_once(dirname(__FILE__)."/Authentication_X509CertRepo.php");
 require_once(dirname(__FILE__)."/Authentication_Session.php");
 /**
@@ -40,7 +40,7 @@ class Authentication_FoafSSLDelegate {
     public  $isAuthenticated   = 0;
     public  $authnDiagnostic   = NULL;
     private $requestURI        = NULL;
-    /** instance of Authentication_Url */
+    /** instance of Authentication_URL */
     private $referer           = NULL;
     private $ts                = NULL;
     private $allowedTimeWindow = 0;
@@ -55,14 +55,14 @@ class Authentication_FoafSSLDelegate {
     const SIG_ALG_RSA_SHA1 = 'rsa-sha1';
     /**
      * Perform delegated FOAF+SSL authentication relying on an Identity Provider
-     * @param Authentication_SignedUrl $request (if not specified infered from _GET)
+     * @param Authentication_SignedURL $request (if not specified infered from _GET)
      * @param Authentication_X509CertRepo $certRepository (if not default is used)
      * @param bool $createSession
      * @param string $sigAlg
      * @param int $allowedTimeWindow
      */
     public function __construct($createSession = TRUE,
-                                Authentication_SignedUrl $request = NULL,
+                                Authentication_SignedURL $request = NULL,
                                 Authentication_X509CertRepo $certRepository = NULL,
                                 $sigAlg = self::SIG_ALG_RSA_SHA1,
                                 $allowedTimeWindow = 300)
@@ -81,7 +81,7 @@ class Authentication_FoafSSLDelegate {
             $certRepository = new Authentication_X509CertRepo();
 
         if (!$request) {
-            $request = Authentication_SignedUrl::parse(
+            $request = Authentication_SignedURL::parse(
                     ((isset($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"] == "on")) ? "https" : "http")
                     . "://".$_SERVER["SERVER_NAME"]
                     . ($_SERVER["SERVER_PORT"] != ((isset($_SERVER["HTTPS"])
@@ -96,7 +96,7 @@ class Authentication_FoafSSLDelegate {
         $ts = $request->getQueryParameter('ts', $_GET["ts"]);
 
         $this->requestURI        = $request;
-        $this->referer           = Authentication_Url::parse( 
+        $this->referer           = Authentication_URL::parse(
                                     $request->getQueryParameter('referer', $_GET["referer"]));
         $this->ts                = $ts;
         $this->webid             = $request->getQueryParameter('webid', $_GET["webid"]);

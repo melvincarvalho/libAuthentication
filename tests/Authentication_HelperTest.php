@@ -60,22 +60,22 @@ class AuthenticationHelperTest extends PHPUnit_Framework_TestCase
      * @test
      * @dataProvider urls
      */
-    public function isValidUrl_verifies_whether_url_is_well_formed_and_resolvable
+    public function isValidURL_verifies_whether_url_is_well_formed_and_resolvable
     (
       $url, $isOk, $comment
     )
     {
         $this->assertEquals($isOk,
-                           Authentication_Helper::isValidUrl($url, 'returnsHTTP200'),
+                           Authentication_Helper::isValidURL($url, 'returnsHTTP200'),
                            $comment);
         $this->assertEquals($isOk,
-                           Authentication_Helper::isValidUrl($url, 'returnsHTTP301'),
+                           Authentication_Helper::isValidURL($url, 'returnsHTTP301'),
                            $comment);
         $this->assertEquals($isOk,
-                           Authentication_Helper::isValidUrl($url, 'returnsHTTP302'),
+                           Authentication_Helper::isValidURL($url, 'returnsHTTP302'),
                            $comment);
         $this->assertEquals(false,
-                           Authentication_Helper::isValidUrl($url, 'returnsHTTP404'),
+                           Authentication_Helper::isValidURL($url, 'returnsHTTP404'),
                            $comment);
     }
 
