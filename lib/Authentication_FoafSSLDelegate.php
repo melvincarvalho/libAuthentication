@@ -46,11 +46,20 @@ class Authentication_FoafSSLDelegate {
     private $allowedTimeWindow = 0;
     private $elapsedTime       = 0;
 
-    const STATUS_AUTH_VIA_SESSION = "Authenticated via a session";
-    const STATUS_DELEGATED_LOGIN_OK = "Delegated FOAF Login response has been authenticated";
-    const STATUS_SIGNATURE_VERIFICATION_ERR = "Signature on response could not be verified";
-    const STATUS_UNSUPPORTED_SIGNATURE_ALG_ERR = "Unsupported signature algorithm";
-    const STATUS_IDP_RESPONSE_TIMEOUT_ERR = "Response from delegate IdP was outside of the allowed time window";
+    const STATUS_AUTH_VIA_SESSION =
+    "Authenticated via a session";
+    
+    const STATUS_DELEGATED_LOGIN_OK =
+    "Delegated FOAF Login response has been authenticated";
+    
+    const STATUS_SIGNATURE_VERIFICATION_ERR =
+    "Signature on response could not be verified";
+    
+    const STATUS_UNSUPPORTED_SIGNATURE_ALG_ERR =
+    "Unsupported signature algorithm";
+    
+    const STATUS_IDP_RESPONSE_TIMEOUT_ERR =
+    "Response from delegate IdP was outside of the allowed time window";
 
     const SIG_ALG_RSA_SHA1 = 'rsa-sha1';
     /**
@@ -63,6 +72,7 @@ class Authentication_FoafSSLDelegate {
      */
     public function __construct($createSession = TRUE,
                                 Authentication_SignedURL $request = NULL,
+                                Authentication_URL $referer = NULL,
                                 Authentication_X509CertRepo $certRepository = NULL,
                                 $sigAlg = self::SIG_ALG_RSA_SHA1,
                                 $allowedTimeWindow = 300)
@@ -96,8 +106,9 @@ class Authentication_FoafSSLDelegate {
         $ts = $request->getQueryParameter('ts', $_GET["ts"]);
 
         $this->requestURI        = $request;
-        $this->referer           = Authentication_URL::parse(
-                                    $request->getQueryParameter('referer', $_GET["referer"]));
+        $this->referer           = NULL != $referer ?
+                                    $referer->parsedURL :
+                                    Authentication_URL::parse($_GET["referer"]);
         $this->ts                = $ts;
         $this->webid             = $request->getQueryParameter('webid', $_GET["webid"]);
         $this->allowedTimeWindow = $allowedTimeWindow;

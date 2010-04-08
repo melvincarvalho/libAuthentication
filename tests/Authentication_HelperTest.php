@@ -1,10 +1,8 @@
 <?php
 //-----------------------------------------------------------------------------------------------------------------------------------
 //
-// Filename   : Authentication_Helper_Spec.php
+// Filename   : Authentication_HelperTest.php
 // Date       : 26th Mar 2010
-//
-// See Also   : https://foaf.me/testLibAuthentication.php
 //
 // Copyright 2008-2010 foaf.me
 //
@@ -28,8 +26,10 @@
 
 require_once 'PHPUnit/Framework.php';
 require_once dirname(__FILE__).'/../lib/Authentication_Helper.php';
-
-class AuthenticationHelperTest extends PHPUnit_Framework_TestCase
+/**
+ * @author László Török
+ */
+class Authentication_HelperTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @test

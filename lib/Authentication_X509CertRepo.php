@@ -56,6 +56,11 @@ Z/JWtoWOo8m4h4fFLFVn2nMur4fC7uKJCS/uUmqrPY3kNCs36Sn9yy6Ek+RMJNnm
 04BmchTSfqsZRx0rzIlznBSVp+4V17I=
 -----END CERTIFICATE-----
 ");
+    public function  __construct(array $IDPCertificates = array())
+    {
+        $this->IDPCertificates =
+                array_merge($this->IDPCertificates, $IDPCertificates);
+    }
 
     /**
      * Get the Identity Provider's certificate

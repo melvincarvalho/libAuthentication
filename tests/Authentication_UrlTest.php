@@ -1,10 +1,8 @@
 <?php
 //-----------------------------------------------------------------------------------------------------------------------------------
 //
-// Filename   : Authentication_Session.php
-// Date       : 14th Feb 2010
-//
-// See Also   : https://foaf.me/testLibAuthentication.php
+// Filename   : Authentication_UrlTest.php
+// Date       : 25th Feb 2010
 //
 // Copyright 2008-2010 foaf.me
 //
@@ -28,8 +26,10 @@
 
 require_once 'PHPUnit/Framework.php';
 require_once dirname(__FILE__).'/../lib/Authentication_URL.php';
-
-class AuthenticationURLTest extends PHPUnit_Framework_TestCase
+/**
+ * @author László Török
+ */
+class Authentication_URLTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @test

@@ -121,7 +121,8 @@ class Authentication_SignedURL extends Authentication_URL
     public function URLWithoutSignature()
     {
         $sig = $this->getQueryParameter('sig');
-        return substr($this->parsedURL, 0, -5-strlen(URLencode(isset($sig) ? $sig : NULL)));
+        // parsedUrl except for &sig=[digital signature]
+        return substr($this->parsedURL, 0, -5-strlen(urlencode(isset($sig) ? $sig : NULL)));
     }
     /**
      * Parses the given URL string into a Authentication_SignedURL
