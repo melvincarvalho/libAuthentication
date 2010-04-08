@@ -7,41 +7,83 @@ Further details of FOAF+SSL are at http://esw.w3.org/topic/foaf+ssl
 To use this libAuthentication you need to add the following requires to your PHP script.
 
 require_once('config.php');
-require_once('lib/libAuthentication.php');
+require_once('lib/Authentication.php');
 
 config.php must be configured with the details of the db you have created for ARC2. 
 Further details of ARC2 are at http://arc.semsol.org/
 
-The main functions in the library are
 
-getAuth() 
-unsetAuthenticatedWebID() 
-getAgent()
+How to set up Foaf+SSL authentication in a few lines of code
+============================================================
 
---------------------------------------------------------------------------------
+There are a few flavours of Foaf+SSL authentication. The following very simple
+example shows how to setup a Foaf+SSL authentication relying on an identity provider
+such as foaf-ssl.org.
 
-getAuth() - Tests if the user has presented a SSL Client Certificate that matches to public key as expressed in a 
-	    FOAF file. getAuth() can work with SSL Client Certificates presented to your server or with the FOAF+SSL 
-	    login delegation server. To use the delegated FOAF+SSL version ask the user to click on something like 
-	    the following. https://foafssl.org/srv/idp?authreqissuer=http://foaf.me/index.php . In this case 
-	    http://foaf.me/index.php executes getAuth(). Alternatively configured your server to request Client 
-	    Certificates on the https page the user tries to access. The page needs to execute getAuth().
+Create a script that will be the entry point for your application:
 
-	    getAuth() stores the result of the user login process in a session so subsequent calls to getAuth() do 
-	    not preform any further remote checks on FOAF files. To re-perform the FOAF fetch you need to execute 
-	    unsetAuthenticatedWebID().
+/index.php
+<?php
+require_once('lib/Authentication.php');
+
+$auth = new Authentication_FoafSSLDelegate();
+
+
+if (!$auth->IsAuthenticated()) { ?>
+<a href="https://foafssl.org/srv/idp?authreqissuer=http://yoursite.com/index.php">Click here to Login</a>
+<?php } else { ?>
+Your have succesfully logged in.
+<?php } ?>
+
+Make sure the "authreqissuer" points to YOUR site and...
+... YOU ARE DONE!
+
+You just set up you first Foaf+SSL powered site. Behind the scenes,
+libAuthentication has a copy of foaf-ssl.org's certificate which is used
+in the authentication process.
+
+A more complex setup
+================================================================================
+If you run your own database that contains Foaf profiles, you can use the
+Authentication class as follows
+
+// set up database
+$config = array(
+        /* db */
+        'db_name'        => 'foaf',                     // db name
+        'db_user'        => 'root',                     // db username
+        'db_pwd'         => '',                         // db password
+        /* store */
+        'store_name'     => 'arc_tests',                // tmp table name
+// run authentication
+$auth = new Authentication($config);
+
+if ($auth->IsAuthenticated()) {
+// ...
+
+Calling new Authentication() tests if the user has presented a SSL Client Certificate
+that matches to public key as expressed in a FOAF file. Authentication can work with
+SSL Client Certificates presented to your server or with the FOAF+SSL login
+delegation server. To use the delegated FOAF+SSL version ask the user to click on something like 
+the following. https://foafssl.org/srv/idp?authreqissuer=http://foaf.me/index.php . In this case 
+http://foaf.me/index.php executes new Authentication($config). Alternatively configured your server to request Client
+Certificates on the https page the user tries to access. The page needs to execute new Authentication($config).
+
+Authentication stores the result of the user login process in a session so subsequent calls to Authentication's constructor do
+not preform any further remote checks on FOAF files. To re-perform the FOAF fetch you need to execute 
+$auth->logout().
 
 ***WARNING***
 
-getAuth() will try to create a session variable therefore it is very important to execute getAuth() before any html 
-is sent to the client.
+Authentication will try to create a session variable therefore it is very
+important to execute new Authentication() before any html is sent to the client.
 Further details here: http://uk3.php.net/manual/en/book.session.php
 
 
 Usage
 -----
 
-$auth = getAuth();
+$auth = new Authentication($config);
 
 
 Returns on Failure

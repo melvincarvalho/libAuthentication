@@ -110,17 +110,12 @@ class Authentication {
             $this->session->unsetAuthenticatedWebid();
     }
 
-    public function Authentication($ARCConfig, $sig = NULL) {
-
-        $this->__construct($ARCConfig, $sig);
-
-    }
-
-    public function getAuth() {
+    public function isAuthenticated() {
         return $this->isAuthenticated;
     }
 
     public function logout() {
+        $this->isAuthenticated = 0;
         $this->session->unsetAuthenticatedWebid();
     }
 

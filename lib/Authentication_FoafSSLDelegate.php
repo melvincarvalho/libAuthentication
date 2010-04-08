@@ -180,5 +180,20 @@ class Authentication_FoafSSLDelegate {
         }
     }
 
+    /**
+     * Is the current user authenticated?
+     * @return bool
+     */
+    public function isAuthenticated() {
+        return $this->isAuthenticated;
+    }
+    /**
+     * Leave the authenticated session
+     */
+    public function logout() {
+        $this->isAuthenticated = 0;
+        $this->session->unsetAuthenticatedWebid();
+    }
+
 }
 ?>
