@@ -23,15 +23,16 @@ cat > index.php
     require_once('libAuthentication/lib/Authentication.php');
     $auth = new Authentication_FoafSSLDelegate();
 
-if (!$auth->isAuthenticated()) { ?>
+if (!$auth->isAuthenticated()) { 
 
-    <a href="https://foafssl.org/srv/idp?authreqissuer=http://localhost/index.php">Click here to Login</a>
+    echo '<a href="https://foafssl.org/srv/idp?authreqissuer=http://localhost/index.php">Click here to Login</a>';
 
-<?php } else { ?>
+} else { 
 
-    Your have succesfully logged in.
+    echo 'Your have succesfully logged in.';
+    print_r($auth);
 
-<?php } ?>
+} 
 
 Make sure the "authreqissuer" points to YOUR site and...
 ... YOU ARE DONE!
