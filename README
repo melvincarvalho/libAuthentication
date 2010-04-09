@@ -15,7 +15,7 @@ such as foaf-ssl.org.
 
 Checkout and Create a script that will be the entry point for your application:
 
-git://github.com/melvincarvalho/libAuthentication.git
+git clone git://github.com/melvincarvalho/libAuthentication.git
 
 cat > index.php
 <?php
