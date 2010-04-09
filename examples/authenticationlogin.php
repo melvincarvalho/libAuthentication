@@ -7,7 +7,7 @@ require_once("lib/Authentication.php");
 
 $auth = new Authentication($GLOBALS['config']);
 
-if ($auth->getAuth())
+if ($auth->isAuthenticated())
     print "Hello : $auth->webid<br/>";
 else
     print "Sorry you are not logged in<br/>";
