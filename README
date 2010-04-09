@@ -29,7 +29,7 @@ if (!$auth->isAuthenticated()) {
 
 } else { 
 
-    echo 'Your have succesfully logged in.';
+    echo 'Your have succesfully logged in.<pre>';
     print_r($auth);
 
 } 
