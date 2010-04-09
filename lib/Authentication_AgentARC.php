@@ -29,7 +29,14 @@
 
 require_once(dirname(__FILE__)."/../arc/ARC2.php");
 require_once(dirname(__FILE__)."/Authentication_AgentAbstract.php");
-
+/**
+ * @author Akbar Hossain
+ * Foaf parser leveraging ARC functionality
+ * It takes URI of an user/agent and looks up properties (e.g. public key)
+ * of the corresponding Foaf profile.
+ *
+ * This class relies on the ARC RDF triple store.
+ */
 class Authentication_AgentARC extends Authentication_AgentAbstract {
 
     private $ARCConfig = NULL;
@@ -42,13 +49,6 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
 
         parent::__construct($agentURI);
     }
-
-    public function Authentication_AgentARC($ARCConfig, $agentURI = NULL, $ARCStore = NULL) {
-
-        $this->__construct($ARCConfig, $agentURI, $ARCStore);
-
-    }
-
 
     public function loadAgent() {
 

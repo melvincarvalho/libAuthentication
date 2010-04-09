@@ -30,15 +30,31 @@
 require_once(dirname(__FILE__)."/Authentication_FoafSSLDelegate.php");
 require_once(dirname(__FILE__)."/Authentication_FoafSSLARC.php");
 require_once(dirname(__FILE__)."/Authentication_AgentARC.php");
-
+/**
+ * @author Akbar Hossain
+ *
+ * Top-level authentication class that integrates multiple authentication
+ * procedures. (session, Foaf+SSL, delegated Foaf+SSL)
+ */
 class Authentication {
 
+    /**
+     * After succesful authentication contains the webid
+     * (e.g. http://foaf.me/tl73#me)
+     * @var string
+     */
     public  $webid             = NULL;
     public  $isAuthenticated   = 0;
+    /**
+     * Always contains the diagnostic message for the last authentication attempt
+     * @var string
+     */
     public  $authnDiagnostic   = NULL;
     public  $agent = NULL;
 
     private $session = NULL;
+
+    const STATUS_AUTH_VIA_SESSION = "Authenticated via a session";
 
     public function __construct($ARCConfig, $sig = NULL) {
 
@@ -47,7 +63,7 @@ class Authentication {
             $this->webid           = $this->session->webid;
             $this->isAuthenticated = $this->session->isAuthenticated;
             $this->agent           = $this->session->agent;
-            $this->authnDiagnostic = "Authenticated via a session";
+            $this->authnDiagnostic = self::STATUS_AUTH_VIA_SESSION;
 /*
             print "<pre>";
             print_r($session);
@@ -109,16 +125,24 @@ class Authentication {
          else
             $this->session->unsetAuthenticatedWebid();
     }
-
+    /**
+     * Is the current user authenticated?
+     * @return bool
+     */
     public function isAuthenticated() {
         return $this->isAuthenticated;
     }
-
+    /**
+     * Leave the authenticated session
+     */
     public function logout() {
         $this->isAuthenticated = 0;
         $this->session->unsetAuthenticatedWebid();
     }
-
+    /**
+     * Returns an the authenticated user's parsed Foaf profile
+     * @return Authentication_AgentARC
+     */
     public function getAgent() {
         return $this->agent;
     }

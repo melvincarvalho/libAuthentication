@@ -28,7 +28,13 @@
 //-----------------------------------------------------------------------------------------------------------------------------------
 
 require_once(dirname(__FILE__)."/Authentication_Helper.php");
-
+/**
+ * @author Akbar Hossain
+ * @abstract
+ * Abstact Foaf parser
+ * It takes URI of an user/agent and looks up properties (e.g. public key)
+ * of the corresponding Foaf profile
+ */
 abstract class Authentication_AgentAbstract {
 
     public $errors   = NULL;
@@ -39,12 +45,6 @@ abstract class Authentication_AgentAbstract {
     public function __construct($agentURI = NULL) {
 
         $this->setAgent($agentURI);
-    }
-
-    public function Authentication_AgentAbstract($agentURI = NULL) {
-
-        $this->__construct($agentURI);
-
     }
 
     public function getAgent() {

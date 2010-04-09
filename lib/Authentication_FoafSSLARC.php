@@ -30,7 +30,12 @@
 require_once(dirname(__FILE__)."/../arc/ARC2.php");
 require_once(dirname(__FILE__)."/Authentication_Helper.php");
 require_once(dirname(__FILE__)."/Authentication_FoafSSLAbstract.php");
-
+/**
+ * @author Akbar Hossain
+ * Implements Foaf+SSL authentication as described by http://esw.w3.org/Foaf%2Bssl
+ *
+ * The facilities of the ARC library are used.
+ */
 class Authentication_FoafSSLARC extends Authentication_FoafSSLAbstract
 {
    private $ARCConfig = NULL;
@@ -43,12 +48,6 @@ class Authentication_FoafSSLARC extends Authentication_FoafSSLAbstract
 
        parent::__construct($createSession, $SSLClientCert);
    }
-
-    public function Authentication_FoafSSLARC($ARCConfig, $ARCStore = NULL, $createSession = TRUE, $SSLClientCert = NULL) {
-
-        $this->__construct($ARCConfig, $ARCStore, $createSession, $SSLClientCert);
-
-    }
 
     private function createStore() {
 

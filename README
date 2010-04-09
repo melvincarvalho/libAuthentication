@@ -4,15 +4,6 @@ Introduction
 libAuthentication is a PHP implementation of the FOAF+SSL protocol
 Further details of FOAF+SSL are at http://esw.w3.org/topic/foaf+ssl
 
-To use this libAuthentication you need to add the following requires to your PHP script.
-
-require_once('config.php');
-require_once('lib/Authentication.php');
-
-config.php must be configured with the details of the db you have created for ARC2. 
-Further details of ARC2 are at http://arc.semsol.org/
-
-
 How to set up Foaf+SSL authentication in a few lines of code
 ============================================================
 
@@ -29,7 +20,7 @@ require_once('lib/Authentication.php');
 $auth = new Authentication_FoafSSLDelegate();
 
 
-if (!$auth->IsAuthenticated()) { ?>
+if (!$auth->isAuthenticated()) { ?>
 <a href="https://foafssl.org/srv/idp?authreqissuer=http://yoursite.com/index.php">Click here to Login</a>
 <?php } else { ?>
 Your have succesfully logged in.
@@ -45,21 +36,13 @@ in the authentication process.
 A more complex setup
 ================================================================================
 If you run your own database that contains Foaf profiles, you can use the
-Authentication class as follows
+Authentication class that handles all supported authentication methods automatically.
 
-// set up database
-$config = array(
-        /* db */
-        'db_name'        => 'foaf',                     // db name
-        'db_user'        => 'root',                     // db username
-        'db_pwd'         => '',                         // db password
-        /* store */
-        'store_name'     => 'arc_tests',                // tmp table name
-// run authentication
-$auth = new Authentication($config);
+Note:
+config.php must be configured with the details of the db you have created for ARC2.
+Further details of ARC2 are at http://arc.semsol.org/
 
-if ($auth->IsAuthenticated()) {
-// ...
+You can find the code in examples/authenticationlogin.php
 
 Calling new Authentication() tests if the user has presented a SSL Client Certificate
 that matches to public key as expressed in a FOAF file. Authentication can work with
@@ -80,9 +63,16 @@ important to execute new Authentication() before any html is sent to the client.
 Further details here: http://uk3.php.net/manual/en/book.session.php
 
 
-Usage
------
+Reference
+===============================================================================
 
+For detailed information on libAuthentication classes please refer to the API
+documentation.
+
+
+
+THE FOLLOWING DOCUMENTATION IS OUTDATED AND WILL BE REMOVED SOON
+==============================================================================
 $auth = new Authentication($config);
 
 

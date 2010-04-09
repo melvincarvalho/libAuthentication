@@ -29,7 +29,13 @@
 
 require_once(dirname(__FILE__)."/Authentication_Helper.php");
 require_once(dirname(__FILE__)."/Authentication_Session.php");
-
+/**
+ * @author Akbar Hossain
+ * @abstract
+ * Implements Foaf+SSL authentication as described by http://esw.w3.org/Foaf%2Bssl
+ *
+ * It contains the storage backend independent code.
+ */
 abstract class Authentication_FoafSSLAbstract {
 
     private $SSLClientCert      = NULL;

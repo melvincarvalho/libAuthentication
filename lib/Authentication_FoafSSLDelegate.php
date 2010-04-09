@@ -35,12 +35,21 @@ require_once(dirname(__FILE__)."/Authentication_Session.php");
  * @author Akbar Hossain
  */
 class Authentication_FoafSSLDelegate {
-
+    /**
+     * After succesful authentication contains the webid
+     * (e.g. http://foaf.me/tl73#me)
+     * @var string
+     */
     public  $webid             = NULL;
     public  $isAuthenticated   = 0;
+    /**
+     * Always contains the diagnostic message for the last authentication attempt
+     * @var string
+     */
     public  $authnDiagnostic   = NULL;
+    /** @var Authentication_SignedURL */
     private $requestURI        = NULL;
-    /** instance of Authentication_URL */
+    /** @var Authentication_URL */
     private $referer           = NULL;
     private $ts                = NULL;
     private $allowedTimeWindow = 0;
