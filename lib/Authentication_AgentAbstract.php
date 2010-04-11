@@ -33,24 +33,36 @@ require_once(dirname(__FILE__)."/Authentication_Helper.php");
  * @abstract
  * Abstact Foaf parser
  * It takes URI of an user/agent and looks up properties (e.g. public key)
- * of the corresponding Foaf profile
+ * of the corresponding Foaf profile.
  */
 abstract class Authentication_AgentAbstract {
 
+    /**
+     * Contains the error message of the last operation.
+     * @var string
+     */
     public $errors   = NULL;
     public $agentURI = NULL;
     public $agentId  = NULL;
+    // TODO we have getAgent, does this need to public??
     public $agent    = NULL;
 
     public function __construct($agentURI = NULL) {
 
         $this->setAgent($agentURI);
     }
-
+    /**
+     * Returns the parsed agent instance.
+     * @return mixed
+     */
     public function getAgent() {
         return $this->agent;
     }
-
+    /**
+     * Set URI of the agent (that is, the URI of the agent's Foaf profile)
+     * @param string $agentURI
+     * @return Boolean True if success, False on Error
+     */
     public function setAgent($agentURI) {
 
         if (isset($agentURI)) {
@@ -61,6 +73,7 @@ abstract class Authentication_AgentAbstract {
                 $this->loadAgent();
                 $this->loadErrors();
                 if (!isset($this->errors)) {
+                    // TODO !!!! Undefined method !!!
                     $this->agentId = $this->getAgentId();
                     $this->agent = $this->getAgentProperties();
                 }
@@ -79,11 +92,11 @@ abstract class Authentication_AgentAbstract {
         return TRUE;
     }
 
-    abstract function loadAgent();
+    public abstract function loadAgent();
 
-    abstract function loadErrors();
+    public abstract function loadErrors();
 
-    abstract function getAgentProperties();
+    public abstract function getAgentProperties();
 
 }
 

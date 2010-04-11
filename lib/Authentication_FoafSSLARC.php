@@ -39,8 +39,18 @@ require_once(dirname(__FILE__)."/Authentication_FoafSSLAbstract.php");
 class Authentication_FoafSSLARC extends Authentication_FoafSSLAbstract
 {
    private $ARCConfig = NULL;
+   // TODO why is this public, if it should be, add phpdoc
    public  $ARCStore  = NULL;
 
+   /**
+    * Authenticate using Foaf+SSL procedure
+    *
+    * @param array $ARCConfig
+    * @param mixed $ARCStore
+    * @param Boolean $createSession
+    TODO what is the type  of $SSLClientCert
+    * @param <type> $SSLClientCert
+    */
    public function __construct($ARCConfig, $ARCStore = NULL, $createSession= TRUE, $SSLClientCert = NULL) {
 
        $this->ARCConfig = $ARCConfig;
