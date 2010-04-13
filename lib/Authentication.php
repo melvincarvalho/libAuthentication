@@ -141,7 +141,7 @@ class Authentication {
     }
     /**
      * Returns an the authenticated user's parsed Foaf profile
-     * @return Authentication_AgentARC
+     * @return array
      */
     public function getAgent() {
         return $this->agent;
