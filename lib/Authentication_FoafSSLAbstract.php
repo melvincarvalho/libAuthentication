@@ -104,10 +104,11 @@ abstract class Authentication_FoafSSLAbstract {
         return $this->isAuthenticated;
 
     }
-    /*  */
 
-    /* Function to return the modulus and exponent of the supplied Client SSL Page */
-    protected function opensslPkeyGetPublicHex() {
+    /**
+     *  Function to return the modulus and exponent of the supplied Client SSL Page 
+     */
+    public function opensslPkeyGetPublicHex() {
 
         if ($this->SSLClientCert) {
 
@@ -141,8 +142,10 @@ abstract class Authentication_FoafSSLAbstract {
 
     }
 
-    /* Returns an array holding the subjectAltName of the supplied SSL Client Certificate */
-    protected function opensslGetSubjectAltName() {
+    /**
+     *  Returns an array holding the subjectAltName of the supplied SSL Client Certificate 
+     */
+    public function opensslGetSubjectAltName() {
 
         if ($this->SSLClientCert) {
 
