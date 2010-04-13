@@ -39,7 +39,7 @@ require_once(dirname(__FILE__)."/Authentication_FoafSSLAbstract.php");
 class Authentication_FoafSSLARC extends Authentication_FoafSSLAbstract
 {
    private $ARCConfig = NULL;
-   // TODO why is this public, if it should be, add phpdoc
+   // TODO this instance is shared
    public  $ARCStore  = NULL;
 
    /**
@@ -48,8 +48,7 @@ class Authentication_FoafSSLARC extends Authentication_FoafSSLAbstract
     * @param array $ARCConfig
     * @param mixed $ARCStore
     * @param Boolean $createSession
-    TODO what is the type  of $SSLClientCert
-    * @param <type> $SSLClientCert
+    * @param String $SSLClientCert Client certificate in PEM format
     */
    public function __construct($ARCConfig, $ARCStore = NULL, $createSession= TRUE, $SSLClientCert = NULL) {
 

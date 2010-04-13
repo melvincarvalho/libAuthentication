@@ -70,6 +70,12 @@ class Authentication_FoafSSLDelegate {
     const STATUS_IDP_RESPONSE_TIMEOUT_ERR =
     "Response from delegate IdP was outside of the allowed time window";
 
+    const STATUS_OPENSSL_VERIFICATION_ERR =
+    "Openssl verification error";
+
+    const STATUS_IDP_CERTIFICATE_MISSING =
+    "Signing IdP's certificate not found";
+
     const SIG_ALG_RSA_SHA1 = 'rsa-sha1';
     /**
      * Perform delegated FOAF+SSL authentication relying on an Identity Provider
@@ -129,7 +135,11 @@ class Authentication_FoafSSLDelegate {
          * verify the integrity of the signed assertion.
          */
         $idpCertificate = $certRepository->getIdpCertificate($this->referer->host);
-        if ( ($this->elapsedTime < $this->allowedTimeWindow) && (!isset($error)) ) {
+        if (!$idpCertificate) {
+           $this->isAuthenticated = 0;
+           $this->authnDiagnostic = self::STATUS_IDP_CERTIFICATE_MISSING;
+
+        } else if ( ($this->elapsedTime < $this->allowedTimeWindow) && (!isset($error)) ) {
 
             $signedInfo = $this->requestURI->urlWithoutSignature();
 
@@ -141,7 +151,6 @@ class Authentication_FoafSSLDelegate {
 
             // Only rsa-sha1 is supported at the moment.
             if ($sigAlg == self::SIG_ALG_RSA_SHA1) {
-                if ($idpCertificate) {
                     $pubKeyId = openssl_get_publickey($idpCertificate);
 
                     // Verifies the signature
@@ -158,14 +167,10 @@ class Authentication_FoafSSLDelegate {
                     } else {
                         // Error during the verification.
                         $this->isAuthenticated = 0;
-                        $this->authnDiagnostic = self::STATUS_SIGNATURE_VERIFICATION_ERR;
+                        $this->authnDiagnostic = self::STATUS_OPENSSL_VERIFICATION_ERR;
                     }
 
                     openssl_free_key($pubKeyId);
-                } else {
-                    $this->isAuthenticated = 0;
-                    $this->authnDiagnostic = "Could not open the pem file of the signing IdP";
-                }
 
             } else {
                 // Unsupported signature algorithm.

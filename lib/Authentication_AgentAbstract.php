@@ -44,8 +44,7 @@ abstract class Authentication_AgentAbstract {
     public $errors   = NULL;
     public $agentURI = NULL;
     public $agentId  = NULL;
-    // TODO we have getAgent, does this need to public??
-    public $agent    = NULL;
+    private $agent    = NULL;
 
     public function __construct($agentURI = NULL) {
 
@@ -97,6 +96,8 @@ abstract class Authentication_AgentAbstract {
     public abstract function loadErrors();
 
     public abstract function getAgentProperties();
+
+    public abstract function getAgentId();
 
 }
 

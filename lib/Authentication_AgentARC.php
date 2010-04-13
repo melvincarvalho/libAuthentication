@@ -91,7 +91,7 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
         return($agent);
     }
 
-    public function getAgentID() {
+    public function getAgentId() {
 
         $agentID = ($agentId = $this->getPrimaryProfile())?$agentId:$this->agentURI;
 
