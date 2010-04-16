@@ -99,7 +99,7 @@ abstract class Authentication_FoafSSLAbstract {
 
     }
 
-    public function getAuth() {
+    public function isAuthenticated() {
 
         return $this->isAuthenticated;
 
