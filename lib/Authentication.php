@@ -50,6 +50,10 @@ class Authentication {
      * @var string
      */
     public  $authnDiagnostic   = NULL;
+    /**
+     *
+     * @var array
+     */
     public  $agent = NULL;
 
     private $session = NULL;
@@ -113,7 +117,7 @@ class Authentication {
             print_r($agent);
             print "</pre>";
 */
-            $this->agent = $agent->agent;
+            $this->agent = $agent->getAgent();
          }
          else {
             $this->webid = NULL;
@@ -141,7 +145,7 @@ class Authentication {
     }
     /**
      * Returns an the authenticated user's parsed Foaf profile
-     * @return array
+     * @return Authentication_AgentARC
      */
     public function getAgent() {
         return $this->agent;
