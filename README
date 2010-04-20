@@ -13,6 +13,10 @@ There are a few flavours of Foaf+SSL authentication. The following very simple
 example shows how to setup a Foaf+SSL authentication relying on an identity provider
 such as foaf-ssl.org.
 
+Prerequisites:
+    * Publicly available internet site
+    * Apache 2.2 and PHP 5.2.x or higher
+
 Checkout and Create a script that will be the entry point for your application:
 
 git clone git://github.com/melvincarvalho/libAuthentication.git
@@ -50,6 +54,10 @@ Authentication class that handles all supported authentication methods automatic
 Note:
 config.php must be configured with the details of the db you have created for ARC2.
 Further details of ARC2 are at http://arc.semsol.org/
+
+Note:
+The current RDF library has a dependency on mysql, so it will only work if you
+have mysql installed.
 
 You can find the code in examples/authenticationlogin.php
 
