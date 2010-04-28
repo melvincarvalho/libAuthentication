@@ -50,20 +50,20 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
         parent::__construct($agentURI);
     }
 
-    public function loadAgent() {
+    protected function loadAgent() {
 
             $this->createStore();
 
     }
 
-    public function loadErrors() {
+    protected function loadErrors() {
 
         if (isset($this->ARCStore) && ($errs = $this->ARCStore->getErrors())) {
             $this->errors = $errs;
         }
     }
 
-    public function getAgentProperties() {
+    protected function getAgentProperties() {
 
         $agent    = NULL;
 
@@ -91,7 +91,7 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
         return($agent);
     }
 
-    public function getAgentId() {
+    protected function getAgentId() {
 
         $agentID = ($agentId = $this->getPrimaryProfile())?$agentId:$this->agentURI;
 
