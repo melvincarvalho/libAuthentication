@@ -5,10 +5,10 @@
 libAuthentication is a PHP implementation of the FOAF+SSL protocol
 Further details of FOAF+SSL are at http://esw.w3.org/topic/foaf+ssl
 
-If you would like to learn how to get going quickly without diving to much into technical details, then read section 2.
-and 3.
+If you would like to learn how to get going quickly without diving to much into technical details, then read 
+section 2. and 3.
 
-The core classes of libAuthentication are tackled in section 4.
+The core classes of libAuthentication are tackled in section 4. and 5.
 
 ================================================================================
 2. How to set up Foaf+SSL authentication in a few lines of code
@@ -74,8 +74,8 @@ the following. https://foafssl.org/srv/idp?authreqissuer=http://foaf.me/index.ph
 http://foaf.me/index.php executes new Authentication($config). Alternatively configured your server to request Client
 Certificates on the https page the user tries to access. The page needs to execute new Authentication($config).
 
-Authentication stores the result of the user login process in a session so subsequent calls to Authentication's constructor do
-not preform any further remote checks on FOAF files. To re-perform the FOAF fetch you need to execute 
+Authentication stores the result of the user login process in a session so subsequent calls to Authentication's 
+constructor do not preform any further remote checks on FOAF files. To re-perform the FOAF fetch you need to execute 
 $auth->logout().
 
 ***WARNING***
@@ -85,7 +85,7 @@ important to execute new Authentication() before any html is sent to the client.
 Further details here: http://uk3.php.net/manual/en/book.session.php
 
 ================================================================================
-4. libAuthentication core classes
+4. Brief overview of libAuthentication's core classes
 ================================================================================
 libAuthentication provides the following core classes:
 
@@ -106,6 +106,43 @@ libAuthentication provides the following core classes:
 * Authentication_Session
   Create a session cookie after successful authentication to speed up subsequent authentication attempts
 
+A detailed description of the core classes an their usage follows.
+
+================================================================================
+5. Detailed description of libAuthentication's core classes
+================================================================================
+* class Authentication_AgentARC (implements Authentication_AgentAbstract)
+-----------------------------------------------------------------------------------------------------------------
+This is basically a parser for a Foaf file identified by a URI (e.g. http://foaf.me/tl73 ). 
+It relies on ARC RDF Store (http://arc.semsol.org/download).
+
+Assuming you pass it a valid URI and appropriate store configuration, it loads the corresponding foaf document.
+$config =  array (  'db_name'  => 'your_db_name',          // db name
+                          'db_user'    => 'your_db_username',    // db username
+                          'db_pwd'    => 'your_password',          // db password
+                    'store_name'    => 'arc_tests',                  // tmp table name
+$webid = 'http://foaf.me/tl73';
+
+$foafDoc = new Authentication_AgentARC($config, $webid);
+
+$oafDoc->agentURI contains the URI passed in.
+
+On Success: 
+$foafDoc->agentId contains the value of the "primaryTopic" property if defined, otherwise it falls back to $this->agentURI.
+
+You can get the parsed foaf file properties as an associative map. 
+$foafProperties = $foafDoc->getAgent()
+
+These properties are currently (only those appear that are found in the foaf file):
+name, mbox, homepage, nick, weblog, img, RSAKey (with mod and exp) and more.
+The semantics of these properties are defined in http://xmlns.com/foaf/spec/.
+
+On Error:
+You can retrieve error message by inspecting the content of $foafDoc->errors (an array).
+
+Note: 
+If the ARC store doesn't exists (first run) it will be created and setup automatically. However,
+the parsing will obviously fail, since the store is empty.
 
 ================================================================================
 Reference
