@@ -116,7 +116,8 @@ A detailed description of the core classes an their usage follows.
 This is basically a parser for a Foaf file identified by a URI (e.g. http://foaf.me/tl73 ). 
 It relies on ARC RDF Store (http://arc.semsol.org/download).
 
-Assuming you pass it a valid URI and appropriate store configuration, it loads the corresponding foaf document.
+Assuming you pass it a valid URI and appropriate store configuration, it loads the corresponding 
+foaf document.
 $config =  array (  'db_name'  => 'your_db_name',          // db name
                           'db_user'    => 'your_db_username',    // db username
                           'db_pwd'    => 'your_password',          // db password
@@ -128,7 +129,8 @@ $foafDoc = new Authentication_AgentARC($config, $webid);
 $oafDoc->agentURI contains the URI passed in.
 
 On Success: 
-$foafDoc->agentId contains the value of the "primaryTopic" property if defined, otherwise it falls back to $this->agentURI.
+$foafDoc->agentId contains the value of the "primaryTopic" property if defined, otherwise it falls back
+to $this->agentURI.
 
 You can get the parsed foaf file properties as an associative map. 
 $foafProperties = $foafDoc->getAgent()
@@ -141,9 +143,32 @@ On Error:
 You can retrieve error message by inspecting the content of $foafDoc->errors (an array).
 
 Note: 
-If the ARC store doesn't exists (first run) it will be created and setup automatically. However,
+If the ARC store doesn't exists (first run), it will be created and setup automatically. However,
 the parsing will obviously fail, since the store is empty.
 
+* class Authentication
+-----------------------------------------------------------------------------------------------------------------
+
+This class provides easy access to all supported authentication mechanisms. On instantiation,
+it performs the following operations:
+1. Checks if an authentication session cookie is present
+2. If 1. fails, it tries to authenticate via delegated Foaf+SSL (see Authentication_FoafSSLDelegate)
+3. If 2. fails, it tries to authenticate via native Foaf+SSL (see Authentication_FoafSSLARC)
+4. If authentication is successful, it loads the corresponding foaf file
+
+$auth = new Authentication($config) // $config is optional, only necessary if ARC is used
+
+On Success:
+
+$auth->isAuthenticated() returns true
+
+$auth->webid contains the authenticated webid
+
+$auth->getAgent() returns the parsed foaf profile that is tied to the authenticated webid 
+(as in Authentication_AgentARC)
+
+If an error occured, an explanation can be retrieved by inspecting $auth->$authnDiagnostic.
+If you want to terminate the authenticated session, it is a good idea to call $auth->logout.
 ================================================================================
 Reference
 ================================================================================
