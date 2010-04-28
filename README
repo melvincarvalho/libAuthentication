@@ -1,13 +1,18 @@
 ============
-Introduction
+1. Introduction
 ============
 
 libAuthentication is a PHP implementation of the FOAF+SSL protocol
 Further details of FOAF+SSL are at http://esw.w3.org/topic/foaf+ssl
 
-============================================================
-How to set up Foaf+SSL authentication in a few lines of code
-============================================================
+If you would like to learn how to get going quickly without diving to much into technical details, then read section 2.
+and 3.
+
+The core classes of libAuthentication are tackled in section 4.
+
+================================================================================
+2. How to set up Foaf+SSL authentication in a few lines of code
+================================================================================
 
 There are a few flavours of Foaf+SSL authentication. The following very simple
 example shows how to setup a Foaf+SSL authentication relying on an identity provider
@@ -46,7 +51,7 @@ libAuthentication has a copy of foaf-ssl.org's certificate which is used
 in the authentication process.
 
 ================================================================================
-A more complex setup
+3. A more complex setup
 ================================================================================
 If you run your own database that contains Foaf profiles, you can use the
 Authentication class that handles all supported authentication methods automatically.
@@ -79,10 +84,32 @@ Authentication will try to create a session variable therefore it is very
 important to execute new Authentication() before any html is sent to the client.
 Further details here: http://uk3.php.net/manual/en/book.session.php
 
+================================================================================
+4. libAuthentication core classes
+================================================================================
+libAuthentication provides the following core classes:
 
-==============================================================================
+* Authentication_AgentARC
+  Parse a Foaf file identified by a Webid (e.g. http://foaf.me/tl73 )
+
+* Authentication
+  Authenticate user by trying all supported authentication methods in a fixed and reasonable sequence
+
+* Authentication_FoafSSLDelegate
+  Authenticate via the delegated Foaf+SSL method using a 3rd party FoafSSL identity provider 
+  (foafssl.org by default)    
+
+* Authentication_FoafSSLARC
+  Authenticate via "native" Foaf+SSL  by relying on a database that stores Foaf files. 
+  (currently the ARC RDF store is used as storage backend)
+
+* Authentication_Session
+  Create a session cookie after successful authentication to speed up subsequent authentication attempts
+
+
+================================================================================
 Reference
-===============================================================================
+================================================================================
 
 For detailed information on libAuthentication classes please refer to the API
 documentation.
