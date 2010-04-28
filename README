@@ -111,6 +111,7 @@ A detailed description of the core classes an their usage follows.
 ================================================================================
 5. Detailed description of libAuthentication's core classes
 ================================================================================
+-----------------------------------------------------------------------------------------------------------------
 * class Authentication_AgentARC (implements Authentication_AgentAbstract)
 -----------------------------------------------------------------------------------------------------------------
 This is basically a parser for a Foaf file identified by a URI (e.g. http://foaf.me/tl73 ). 
@@ -118,15 +119,15 @@ It relies on ARC RDF Store (http://arc.semsol.org/download).
 
 Assuming you pass it a valid URI and appropriate store configuration, it loads the corresponding 
 foaf document.
-$config =  array (  'db_name'  => 'your_db_name',          // db name
-                          'db_user'    => 'your_db_username',    // db username
-                          'db_pwd'    => 'your_password',          // db password
-                    'store_name'    => 'arc_tests',                  // tmp table name
+$config =  array (  'db_name'  => 'your_db_name',        // db name
+                  'db_user'    => 'your_db_username',    // db username
+                   'db_pwd'    => 'your_password',       // db password
+               'store_name'    => 'arc_tests',           // tmp table name
 $webid = 'http://foaf.me/tl73';
 
 $foafDoc = new Authentication_AgentARC($config, $webid);
 
-$oafDoc->agentURI contains the URI passed in.
+$foafDoc->agentURI contains the URI passed in.
 
 On Success: 
 $foafDoc->agentId contains the value of the "primaryTopic" property if defined, otherwise it falls back
@@ -146,9 +147,9 @@ Note:
 If the ARC store doesn't exists (first run), it will be created and setup automatically. However,
 the parsing will obviously fail, since the store is empty.
 
+-----------------------------------------------------------------------------------------------------------------
 * class Authentication
 -----------------------------------------------------------------------------------------------------------------
-
 This class provides easy access to all supported authentication mechanisms. On instantiation,
 it performs the following operations:
 1. Checks if an authentication session cookie is present
@@ -170,6 +171,7 @@ $auth->getAgent() returns the parsed foaf profile that is tied to the authentica
 If an error occurs, an explanation can be retrieved by inspecting $auth->$authnDiagnostic.
 If you want to terminate the authenticated session, it is a good idea to call $auth->logout.
 
+-----------------------------------------------------------------------------------------------------------------
 * class Authentication_Session
 -----------------------------------------------------------------------------------------------------------------
 This class usually won't be instantiated directly. If a given authentication method succeeds, it can optionally 
@@ -182,11 +184,13 @@ $authSession = new Authentication_Session( 1, $agent, $webid)
 
 where 1 indicates the fact of successful authentication, $agent is an associative array representation of the Foaf file that associated with $webid, which is a URI string.
 
+-----------------------------------------------------------------------------------------------------------------
 * class Authentication_FoafSSLDelegate
 -----------------------------------------------------------------------------------------------------------------
 Using the delegated Foaf+SSL method is probably the easiest way to get you start quickly leveraging this
 powerful authentication method. It is also the easiest to set up. Refer to Section 2. for an example and make sure
 you set up the example using a public domain name or a public IP address.
+I you want find out more details how the identity provider works, see https://foafssl.org/srv/idp.
 
 You need to instantiate Authentication_FoafSSLDelegate at a common entry point to your site (e.g. index.php):
 
@@ -201,13 +205,43 @@ $auth->isAuthenticated() returns true
 
 $auth->webid contains the authenticated webid
 
-If not explicitly disabled, on successful authentication an instance of Authentication_Session will also be created, to speed up further authentication attempts. If that something you don't want to happend, you need to call the constructor as follows:
+If not explicitly disabled, on successful authentication an instance of Authentication_Session 
+will also be created, to speed up further authentication attempts. If that something you 
+don't want to happend, you need to call the constructor as follows:
 
 $auth = new Authentication_FoafSSLDelegate( false );
 
 If an error occurs, an explanation can be retrieved by inspecting $auth->$authnDiagnostic.
 If you want to terminate the authenticated session, it is a good idea to call $auth->logout.
 
+-----------------------------------------------------------------------------------------------------------------
+* class Authentication_FoafSSLARC (implements Authentication_FoafSSLAbstract)
+-----------------------------------------------------------------------------------------------------------------
+This implements the "native" Foaf+SSL authentication. The current implementation relies
+on the ARC RDF store. The public key tied to the webid is extracted via Sparql query,
+as are other properties of the corresponding foaf file.
+To perform the authentication, you only need
+
+$auth = new Authentication_FoafSSLARC($config)
+
+where $config is the same configuration you used for Authentication_AgentARC.
+The rest of the constructor parameters are better left at their default value.
+
+On Success:
+
+$auth->isAuthenticated()	returns true
+$auth->webid			contains the authenticated webid
+$auth->certModulus		modulus of the associated public key      
+$auth->certExponent		exponent of the associated public key
+$auth->certSubjectAltName	subjectAltName from the x509 extension section
+
+FoafSSLARC (FoafSSLAbstract) also instantiates a Authentication_Session. You can
+disabled that by passing "false" as 3rd parameter.
+
+$auth = new Authentication_FoafSSLARC($config, NULL, false);
+
+If an error occurs, an explanation can be retrieved by inspecting $auth->$authnDiagnostic.
+If you want to terminate the authenticated session, it is a good idea to call $auth->logout.
 ================================================================================
 Reference
 ================================================================================
