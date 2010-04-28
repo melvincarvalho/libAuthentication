@@ -91,13 +91,13 @@ abstract class Authentication_AgentAbstract {
         return TRUE;
     }
 
-    public abstract function loadAgent();
+    protected abstract function loadAgent();
 
-    public abstract function loadErrors();
+    protected abstract function loadErrors();
 
-    public abstract function getAgentProperties();
+    protected abstract function getAgentProperties();
 
-    public abstract function getAgentId();
+    protected abstract function getAgentId();
 
 }
 
