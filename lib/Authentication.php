@@ -43,12 +43,15 @@ class Authentication {
      * @var string
      */
     public  $webid             = NULL;
+
     public  $isAuthenticated   = 0;
+
     /**
      * Always contains the diagnostic message for the last authentication attempt
      * @var string
      */
     public  $authnDiagnostic   = NULL;
+    
     /**
      *
      * @var array
@@ -61,6 +64,7 @@ class Authentication {
 
     public function __construct($ARCConfig, $sig = NULL) {
 
+        // 1. Authenticate via session and return
         $this->session = new Authentication_Session();
         if ($this->session->isAuthenticated) {
             $this->webid           = $this->session->webid;
@@ -70,8 +74,8 @@ class Authentication {
             return;
         }
 
+        // 2. Authenticate via delegated login
         $sig = isset($sig)?$sig:$_GET["sig"];
-
         if ( (isset($sig)) ) {
             $authDelegate = new Authentication_FoafSSLDelegate(FALSE);
 
@@ -80,6 +84,7 @@ class Authentication {
             $this->authnDiagnostic = $authDelegate->authnDiagnostic;
         }
 
+        // 3. Authenticate via native FOAF+SSL
         $authSSL = NULL;
         if ( ($this->isAuthenticated == 0) ) {
             $authSSL = new Authentication_FoafSSLARC($ARCConfig, NULL, FALSE);
@@ -90,24 +95,26 @@ class Authentication {
         }
 
         if ($this->isAuthenticated) {
-            if (isset($authSSL))
+            if (isset($authSSL)) {
                 $ARCStore = $authSSL->ARCStore;
-            else
+            } else {
                 $ARCStore = NULL;
+            }
 
             $agent = new Authentication_AgentARC($ARCConfig, $this->webid, $ARCStore);
             $this->agent = $agent->getAgent();
-        }
-        else {
+        } else {
             $this->webid = NULL;
             $this->agent = NULL;
         }
 
-        if ($this->isAuthenticated)
+        if ($this->isAuthenticated) {
             $this->session->setAuthenticatedWebid($this->webid, $this->agent);
-        else
+        } else {
             $this->session->unsetAuthenticatedWebid();
+        }
     }
+
     /**
      * Is the current user authenticated?
      * @return bool
@@ -115,6 +122,7 @@ class Authentication {
     public function isAuthenticated() {
         return $this->isAuthenticated;
     }
+
     /**
      * Leave the authenticated session
      */
@@ -122,6 +130,7 @@ class Authentication {
         $this->isAuthenticated = 0;
         $this->session->unsetAuthenticatedWebid();
     }
+
     /**
      * Returns an the authenticated user's parsed Foaf profile
      * @return Authentication_AgentARC
