@@ -68,65 +68,45 @@ class Authentication {
             $this->isAuthenticated = $this->session->isAuthenticated;
             $this->agent           = $this->session->agent;
             $this->authnDiagnostic = self::STATUS_AUTH_VIA_SESSION;
-/*
-            print "<pre>";
-            print_r($session);
-            print "</pre>";
-*/
             return;
-         }
+        }
 
-         $sig = isset($sig)?$sig:$_GET["sig"];
+        $sig = isset($sig)?$sig:$_GET["sig"];
 
-         if ( /*($this->isAuthenticated == 0) &&*/ (isset($sig)) ) {
-             $authDelegate = new Authentication_FoafSSLDelegate(FALSE);
+        if ( (isset($sig)) ) {
+            $authDelegate = new Authentication_FoafSSLDelegate(FALSE);
 
-             $this->webid           = $authDelegate->webid;
-             $this->isAuthenticated = $authDelegate->isAuthenticated;
-             $this->authnDiagnostic = $authDelegate->authnDiagnostic;
-/*
-             print "<pre>";
-             print_r($authDelegate);
-             print "</pre>";
-*/
-         }
+            $this->webid           = $authDelegate->webid;
+            $this->isAuthenticated = $authDelegate->isAuthenticated;
+            $this->authnDiagnostic = $authDelegate->authnDiagnostic;
+        }
 
-         $authSSL = NULL;
-         if ( ($this->isAuthenticated == 0) && true ) {
-             $authSSL = new Authentication_FoafSSLARC($ARCConfig, NULL, FALSE);
+        $authSSL = NULL;
+        if ( ($this->isAuthenticated == 0) && true ) {
+            $authSSL = new Authentication_FoafSSLARC($ARCConfig, NULL, FALSE);
 
-             $this->webid           = $authSSL->webid;
-             $this->isAuthenticated = $authSSL->isAuthenticated;
-             $this->authnDiagnostic = $authSSL->authnDiagnostic;
-/*
-             print "<pre>";
-             print_r($authSSL);
-             print "</pre>";
-*/
-         }
+            $this->webid           = $authSSL->webid;
+            $this->isAuthenticated = $authSSL->isAuthenticated;
+            $this->authnDiagnostic = $authSSL->authnDiagnostic;
+        }
 
-         if ($this->isAuthenticated) {
+        if ($this->isAuthenticated) {
             if (isset($authSSL))
                 $ARCStore = $authSSL->ARCStore;
             else
                 $ARCStore = NULL;
-            
+
             $agent = new Authentication_AgentARC($ARCConfig, $this->webid, $ARCStore);
-/*
-            print "<pre>";
-            print_r($agent);
-            print "</pre>";
-*/
             $this->agent = $agent->getAgent();
-         }
-         else {
+        }
+        else {
             $this->webid = NULL;
             $this->agent = NULL;
-         }
+        }
 
-         if ($this->isAuthenticated)
+        if ($this->isAuthenticated)
             $this->session->setAuthenticatedWebid($this->webid, $this->agent);
-         else
+        else
             $this->session->unsetAuthenticatedWebid();
     }
     /**
