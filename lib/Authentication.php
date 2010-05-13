@@ -40,7 +40,6 @@ class Authentication {
 
     /**
      * After succesful authentication contains the webid
-     * (e.g. http://foaf.me/tl73#me)
      * @var string
      */
     public  $webid             = NULL;
