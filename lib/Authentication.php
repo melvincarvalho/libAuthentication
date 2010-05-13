@@ -81,7 +81,7 @@ class Authentication {
         }
 
         $authSSL = NULL;
-        if ( ($this->isAuthenticated == 0) && true ) {
+        if ( ($this->isAuthenticated == 0) ) {
             $authSSL = new Authentication_FoafSSLARC($ARCConfig, NULL, FALSE);
 
             $this->webid           = $authSSL->webid;
