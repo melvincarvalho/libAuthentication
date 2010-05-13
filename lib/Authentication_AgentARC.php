@@ -52,7 +52,7 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
 
     protected function loadAgent() {
 
-            $this->createStore();
+        $this->createStore();
 
     }
 
@@ -69,22 +69,32 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
 
         if ($this->agentURI && $this->agentId && $this->ARCStore) {
 
+            // Get pseudonyms
             if ( $nyms = $this->getAgentNyms() ) {
                 $agent = $nyms;
             }
 
-            if ($agentRSAKey = $this->getFoafRSAKey())
+            // Get the key
+            if ($agentRSAKey = $this->getFoafRSAKey()) {
                 $agent = Authentication_Helper::safeArrayMerge($agent, array('RSAKey'=>$agentRSAKey));
+            }
 
-            if ($openID = $this->getOpenID())
+            // Get openID
+            if ($openID = $this->getOpenID()) {
                 $agent = Authentication_Helper::safeArrayMerge($agent, $openID);
+            }
 
-            if ($names = $this->getNameParts())
+            // Get name parts
+            if ($names = $this->getNameParts()) {
                 $agent = Authentication_Helper::safeArrayMerge($agent, $names);
+            }
 
-            if ($friends = $this->getAllFriends())
+            // Get Friends
+            if ($friends = $this->getAllFriends()) {
                 $agent = Authentication_Helper::safeArrayMerge($agent, array('knows'=>$friends));
+            }
 
+            // Set up Agent
             $agent = Authentication_Helper::safeArrayMerge(array("webid"=>$this->agentId), $agent);
         }
 
@@ -291,7 +301,7 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
                         $webid = $this->webid($seeAlso, $y, $row['homepage'], $row['mbox']);
 
                         if ($webid != $prevWebid) {
-                            
+
                             if (isset($row['name']))
                                 $res = array('name'=>$row['name']);
 
@@ -313,7 +323,7 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
                                 $results[] = $res;
                                 $res = NULL;
                             }
-                            
+
                             $prevWebid = $webid;
                         }
                         else {
@@ -333,8 +343,7 @@ class Authentication_AgentARC extends Authentication_AgentAbstract {
                         $webid[$key] = $row['webid'];
                     }
 
-                    if (is_array($name))
-                    {
+                    if (is_array($name)) {
                         $name_lowercase = array_map('strtolower', $name);
 
                         array_multisort($name_lowercase, SORT_ASC, SORT_STRING, $results);
