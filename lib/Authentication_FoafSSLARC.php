@@ -139,6 +139,38 @@ class Authentication_FoafSSLARC extends Authentication_FoafSSLAbstract {
         return ( $res );
     }
 
+    function getIdentityFromNode( $node , $index ) {
+        $exponent = 0;
+        $modulus = '';
+        if( $node['http://www.w3.org/ns/auth/rsa#modulus'][0]['datatype'] == 'http://www.w3.org/ns/auth/cert#hex' ) {
+            $modulus = $node['http://www.w3.org/ns/auth/rsa#modulus'][0]['value'];
+        } elseif( isset($index[ $node['http://www.w3.org/ns/auth/rsa#modulus'][0]['value'] ]) ) {
+            $modulus = $index[ $node['http://www.w3.org/ns/auth/rsa#modulus'][0]['value'] ]['http://www.w3.org/ns/auth/cert#hex'][0]['value'];
+        }
+        $modulus =  strtoupper(preg_replace( '/[^0-9a-f]/im' , '' , $modulus ));
+        $modulus = str_split( $modulus , 2 );
+        while( $modulus[0] == '00' ) {
+            array_shift($modulus);
+        }
+        $modulus = implode( '' , $modulus );
+        if( $node['http://www.w3.org/ns/auth/rsa#public_exponent'][0]['datatype'] == 'http://www.w3.org/ns/auth/cert#int' ) {
+            $exponent = $node['http://www.w3.org/ns/auth/rsa#public_exponent'][0]['value'];
+        } else {
+            $temp = $index[ $node['http://www.w3.org/ns/auth/rsa#public_exponent'][0]['value'] ];
+            if( isset($temp['http://www.w3.org/ns/auth/cert#int']) ) {
+                $exponent = $temp['http://www.w3.org/ns/auth/cert#int'][0]['value'];
+            } else {
+                $exponent = $temp['http://www.w3.org/ns/auth/cert#decimal'][0]['value'];
+            }
+        }
+        return (object)array(
+                        'webid' => $node['http://www.w3.org/ns/auth/cert#identity'][0]['value'],
+                        'modulus' => $modulus,
+                        'exponent' => $exponent
+        );
+    }
+
+
     protected function getAgentRSAKey() {
 
         if ($this->webid) {
