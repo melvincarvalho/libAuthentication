@@ -36,27 +36,26 @@ require_once(dirname(__FILE__)."/Authentication_FoafSSLAbstract.php");
  *
  * The facilities of the ARC library are used.
  */
-class Authentication_FoafSSLARC extends Authentication_FoafSSLAbstract
-{
-   private $ARCConfig = NULL;
-   // TODO this instance is shared
-   public  $ARCStore  = NULL;
+class Authentication_FoafSSLARC extends Authentication_FoafSSLAbstract {
+    private $ARCConfig = NULL;
+    // TODO this instance is shared
+    public  $ARCStore  = NULL;
 
-   /**
-    * Authenticate using Foaf+SSL procedure
-    *
-    * @param array $ARCConfig
-    * @param mixed $ARCStore
-    * @param Boolean $createSession
-    * @param String $SSLClientCert Client certificate in PEM format
-    */
-   public function __construct($ARCConfig, $ARCStore = NULL, $createSession= TRUE, $SSLClientCert = NULL) {
+    /**
+     * Authenticate using Foaf+SSL procedure
+     *
+     * @param array $ARCConfig
+     * @param mixed $ARCStore
+     * @param Boolean $createSession
+     * @param String $SSLClientCert Client certificate in PEM format
+     */
+    public function __construct($ARCConfig, $ARCStore = NULL, $createSession= TRUE, $SSLClientCert = NULL) {
 
-       $this->ARCConfig = $ARCConfig;
-       $this->ARCStore = $ARCStore;
+        $this->ARCConfig = $ARCConfig;
+        $this->ARCStore = $ARCStore;
 
-       parent::__construct($createSession, $SSLClientCert);
-   }
+        parent::__construct($createSession, $SSLClientCert);
+    }
 
     private function createStore() {
 
@@ -97,10 +96,10 @@ class Authentication_FoafSSLARC extends Authentication_FoafSSLAbstract
         if ($rows = $this->ARCStore->query($q, 'rows')) {
             foreach ($rows as $row) {
 //                    print "primaryTopic " . $row['primaryTopic'] . "<br/>";
-                    $primaryId = $row['primaryTopic'];
+                $primaryId = $row['primaryTopic'];
             }
         }
-	/* list names */
+        /* list names */
         $q = " PREFIX cert: <http://www.w3.org/ns/auth/cert#>
                PREFIX rsa: <http://www.w3.org/ns/auth/rsa#>
                SELECT ?m ?e ?mod ?exp ?person
@@ -112,8 +111,8 @@ class Authentication_FoafSSLARC extends Authentication_FoafSSLAbstract
                        OPTIONAL { ?e cert:decimal ?exp . }
                      } ";
 
-      if ($rows = $this->ARCStore->query($q, 'rows')) {
- 
+        if ($rows = $this->ARCStore->query($q, 'rows')) {
+
             foreach ($rows as $row) {
 
                 if ($row['person']==$primaryId) {
@@ -135,9 +134,9 @@ class Authentication_FoafSSLARC extends Authentication_FoafSSLAbstract
 
                 }
             }
-       }
-       
-       return ( $res );
+        }
+
+        return ( $res );
     }
 
     protected function getAgentRSAKey() {
@@ -148,8 +147,7 @@ class Authentication_FoafSSLARC extends Authentication_FoafSSLAbstract
 
             $store = $this->ARCStore;
 
-            if (isset($store) && ($errs = $store->getErrors()))
-            {
+            if (isset($store) && ($errs = $store->getErrors())) {
                 return NULL;
             }
 
