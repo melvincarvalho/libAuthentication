@@ -84,7 +84,7 @@ abstract class Authentication_FoafSSLAbstract {
         }
     }
 
-     /**
+    /**
      * Is the current user authenticated?
      * @return bool
      */
@@ -103,7 +103,7 @@ abstract class Authentication_FoafSSLAbstract {
     }
 
     /**
-     *  Function to return the modulus and exponent of the supplied Client SSL Page 
+     *  Function to return the modulus and exponent of the supplied Client SSL Page
      */
     protected function opensslPkeyGetPublicHex() {
 
@@ -140,7 +140,7 @@ abstract class Authentication_FoafSSLAbstract {
     }
 
     /**
-     *  Returns an array holding the subjectAltName of the supplied SSL Client Certificate 
+     *  Returns an array holding the subjectAltName of the supplied SSL Client Certificate
      */
     protected function opensslGetSubjectAltName() {
 
