@@ -139,6 +139,16 @@ class Authentication_FoafSSLARC extends Authentication_FoafSSLAbstract {
         return ( $res );
     }
 
+    function getIdentitiesFromFOAF( $foaf ) {
+        $foafIdentities = array();
+        foreach( $foaf->index as $ref => $node ) {
+            if( hasTypeFromIndexNode($node , 'http://www.w3.org/ns/auth/rsa#RSAPublicKey' ) ) {
+                $foafIdentities[] = getIdentityFromNode( $node , $foaf->index );
+            }
+        }
+        return $foafIdentities;
+    }
+   
     function getIdentityFromNode( $node , $index ) {
         $exponent = 0;
         $modulus = '';
