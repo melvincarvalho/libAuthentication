@@ -138,17 +138,100 @@ class Authentication_FoafSSLARC extends Authentication_FoafSSLAbstract {
 
         return ( $res );
     }
+    
+    protected function getAgentRSAKey() {
 
-    function getIdentitiesFromFOAF( $foaf ) {
-        $foafIdentities = array();
-        foreach( $foaf->index as $ref => $node ) {
-            if( hasTypeFromIndexNode($node , 'http://www.w3.org/ns/auth/rsa#RSAPublicKey' ) ) {
-                $foafIdentities[] = getIdentityFromNode( $node , $foaf->index );
+        if ($this->webid) {
+
+            $this->createStore();
+
+            $store = $this->ARCStore;
+
+            if (isset($store) && ($errs = $store->getErrors())) {
+                return NULL;
+            }
+
+            if (isset($store) && ($agentRSAKey = $this->getFoafRSAKey()))
+                return($agentRSAKey);
+
+            return NULL;
+
+        }
+
+    }
+
+    function getBindings( $sparql_results ) {
+        return $sparql_results->results->bindings;
+    }
+
+    /**
+     * url safety for differing domains, wrap all urls in u() to make the correct uri
+     * for current site
+     *
+     * @param $uri
+     * @return unknown_type
+     */
+    function u( $uri ) {
+        return str_replace( RDF_BASE , 'http://' . $_SERVER['HTTP_HOST'] . '/' , $uri );
+    }
+
+    /**
+     * this one trims down a uri to be the domain only (w/ prefix and trailing slash
+     *
+     * @param $uri
+     * @return unknown_type
+     */
+    function t( $uri ) {
+        return implode('/' , array_slice( explode( '/' , $uri , 4 ) , 0 , 3) ) . '/';
+    }
+
+    /**
+     * this one trims down a uri to be the domain only
+     *
+     * @param $uri
+     * @return unknown_type
+     */
+    function d( $uri ) {
+        return implode('/' , array_slice( explode( '/' , $uri , 4 ) , 2 , 1) );
+    }
+
+    /**
+     * proxy method to get the value of an object / node
+     *
+     * @param $obj
+     * @return unknown_type
+     */
+    function v( $obj ) {
+        return Tripler::getValue( $obj );
+    }
+
+    function dr( $obj ) {
+        return date( DATE_RFC822 , v($obj) );
+    }
+
+    function dt( $obj ) {
+        return date( 'Y-m-d H:i:s' , v($obj) );
+    }
+
+    function pl( $page ) {
+        $qs = $_SERVER['QUERY_STRING'];
+        if( strlen($qs) ) {
+            if( ( $colon = strpos($qs , ';') ) > 0 ) {
+                $qs = substr( $qs , 0 , $colon );
             }
         }
-        return $foafIdentities;
+        return sprintf( '?%s;%s' , $qs , $page );
     }
-   
+
+    function uriSafe( $string ) {
+        return urlencode( preg_replace('/__+/', '_' , preg_replace( array( '/\h\h+/' , '/\v\v+/' , '/ /' ), '_' , $string ) ) );
+    }
+
+    function cleanWords( $string ) {
+        return trim( preg_replace( array( '/\W/' , '/\h\h+/' ) , ' ' , $string ) );
+    }
+
+
     function getIdentityFromNode( $node , $index ) {
         $exponent = 0;
         $modulus = '';
@@ -180,27 +263,76 @@ class Authentication_FoafSSLARC extends Authentication_FoafSSLAbstract {
         );
     }
 
-
-    protected function getAgentRSAKey() {
-
-        if ($this->webid) {
-
-            $this->createStore();
-
-            $store = $this->ARCStore;
-
-            if (isset($store) && ($errs = $store->getErrors())) {
-                return NULL;
+    function hasTypeFromIndexNode( $node , $type ) {
+        if( isset($node['http://www.w3.org/1999/02/22-rdf-syntax-ns#type']) ) {
+            foreach( $node['http://www.w3.org/1999/02/22-rdf-syntax-ns#type'] as $offset => $valueSet ) {
+                if( v((object)$valueSet) == $type ) {
+                    return TRUE;
+                }
             }
-
-            if (isset($store) && ($agentRSAKey = $this->getFoafRSAKey()))
-                return($agentRSAKey);
-
-            return NULL;
-
         }
-
+        return FALSE;
     }
+
+    function getIdentitiesFromFOAF( $foaf ) {
+        $foafIdentities = array();
+        foreach( $foaf->index as $ref => $node ) {
+            if( hasTypeFromIndexNode($node , 'http://www.w3.org/ns/auth/rsa#RSAPublicKey' ) ) {
+                $foafIdentities[] = getIdentityFromNode( $node , $foaf->index );
+            }
+        }
+        return $foafIdentities;
+    }
+
+    function getIdentityFromCert( $cert ) {
+        if( strlen($cert) < 50 ) {
+            throw new Exception( 'No SSL Certificate' );
+        }
+        $x509certDetails = openssl_x509_parse( $cert );
+        preg_match( '/URI\:([^,$]+)/iu' , $x509certDetails['extensions']['subjectAltName'] , $webID );
+        $webID = array_pop($webID);
+        $key = openssl_pkey_get_details( openssl_pkey_get_public( $cert ) );
+        $return = `echo "{$key['key']}" | openssl rsa -pubin -inform PEM -text`;
+        preg_match( '/Exponent\: ([0-9]+)/im', $return , $exponent );
+        preg_match_all( '/([0-9a-f]{2})(\:|\n)/m', $return , $modulus );
+        $modulus = $modulus[1];
+        if( !(count($modulus) % 2) ) {
+            array_pop($modulus);
+        }
+        while( $modulus[0] == '00' ) {
+            array_shift($modulus);
+        }
+        return (object)array(
+                        'webid' => $webID,
+                        'modulus' => strtoupper( implode( '' , $modulus ) ),
+                        'exponent' => $exponent[1]
+        );
+    }
+
+    function authenticate( $identity ) {
+        $foaf = RDFCache::getRDF( $identity->webid );
+        $foafIdentities = getIdentitiesFromFOAF( $foaf );
+        foreach( $foafIdentities as $offset => $foafIdentity ) {
+            if( $foafIdentity == $identity ) {
+                return TRUE;
+            }
+        }
+        return FALSE;
+    }
+
+    function login() {
+        try {
+            $identity = getIdentityFromCert( $_SERVER['REMOTE_USER'] );
+            if( authenticate($identity) ) {
+                return $identity;
+            }
+        } catch ( Exception $e ) {
+            echo $e;
+            throw $e;
+        }
+    }
+
+
 
 }
 
