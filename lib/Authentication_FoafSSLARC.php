@@ -28,6 +28,7 @@
 //-----------------------------------------------------------------------------------------------------------------------------------
 
 require_once(dirname(__FILE__)."/../arc/ARC2.php");
+require_once(dirname(__FILE__)."/Authentication_RDFCache.php");
 require_once(dirname(__FILE__)."/Authentication_Helper.php");
 require_once(dirname(__FILE__)."/Authentication_FoafSSLAbstract.php");
 /**
