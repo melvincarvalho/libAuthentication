@@ -30,9 +30,27 @@
 require_once(dirname(__FILE__)."/Authentication_FoafSSLDelegate.php");
 require_once(dirname(__FILE__)."/Authentication_FoafSSLARC.php");
 require_once(dirname(__FILE__)."/Authentication_AgentARC.php");
+
+
 /**
- * @author Akbar Hossain
- *
+ * Simple weblogin function, assumes config is set
+ */
+function weblogin() {
+     $auth = new Authentication($GLOBALS['config']);
+     return $auth;
+}
+
+/**
+ * Simple weblogin display
+ */
+function weblogin_display() {
+    print '<a id="account" href="https://foafssl.org/srv/idp?authreqissuer=' 
+        . "http://" . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] 
+        . '">Login via foafssl.org</a>';
+}
+
+
+/**
  * Top-level authentication class that integrates multiple authentication
  * procedures. (session, Foaf+SSL, delegated Foaf+SSL)
  */
