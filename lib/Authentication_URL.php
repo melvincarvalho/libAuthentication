@@ -112,7 +112,10 @@ class Authentication_SignedURL extends Authentication_URL
      */
     public function digitalSignature()
     {
-        return base64_decode($this->getQueryParameter('sig'));
+      //        return base64_decode($this->getQueryParameter('sig'));
+      $data = $this->getQueryParameter('sig');
+      $data = str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT);
+      return base64_decode($data);
     }
     /**
      * Returns the original parsed URL without the digital signature
