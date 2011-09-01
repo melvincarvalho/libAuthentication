@@ -122,7 +122,12 @@ class Authentication_SignedURL extends Authentication_URL
     {
         $sig = $this->getQueryParameter('sig');
         // parsedUrl except for &sig=[digital signature]
-        return substr($this->parsedURL, 0, -5-strlen(urlencode(isset($sig) ? $sig : NULL)));
+        //return substr($this->parsedURL, 0, -5-strlen(urlencode(isset($sig) ? $sig : NULL)));
+	$encodedsig=urlencode(isset($sig) ? $sig : NULL);
+        $encodedsig='&sig='.$encodedsig;
+        $startofsig=strpos($this->parsedURL, $encodedsig);
+	$start=substr($this->parsedURL, 0, $startofsig);
+        return $start;
     }
     /**
      * Parses the given URL string into a Authentication_SignedURL
