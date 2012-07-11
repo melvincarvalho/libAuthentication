@@ -6,7 +6,7 @@
 // Date       : 15th October 2009
 // Version    : 0.1
 //
-// Copyright (C) 2012 Melvin Carvalho
+// Copyright (C) 2012 Melvin Carvalho, Akbar Hossain, László Török
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
