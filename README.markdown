@@ -35,6 +35,7 @@ Checkout and create a script that will be the entry point for your application:
 
     if (!$auth->isAuthenticated()) 
     { 
+      echo $auth->authnDiagnostic;
       echo '<a href="https://foafssl.org/srv/idp?authreqissuer=http://localhost/index.php">Click here to Login</a>';
     } 
     else 
@@ -49,6 +50,19 @@ Make sure the _"authreqissuer"_ points to YOUR site and...
 You just set up you first Foaf+SSL powered site. Behind the scenes,
 _libAuthentication_ has a copy of foaf-ssl.org's certificate which is used
 in the authentication process.
+
+
+Note that if you wish to use another delegated identity verification
+service (for instance 'auth.my-profile.eu'), you maye need to change line 4 as :
+
+    $auth = new Authentication_FoafSSLDelegate(TRUE, NULL, Authentication_URL::parse('https://auth.my-profile.eu'));
+
+Then you'd change the login link to : 
+
+    echo '<a href="https://auth.my-profile.eu/auth/index.php?authreqissuer=http://fusionforge.int-evry.fr/libauthentication/index.php">Click here to Login</a>';
+
+This will ensure that you wish to verify the server's response
+signature according to the proper certificate already present in Authentication_X509CertRepo.php
 
 --------------------------------------------------------------------------------
 
