@@ -27,7 +27,10 @@
 //
 //-----------------------------------------------------------------------------------------------------------------------------------
 
-require_once(dirname(__FILE__)."/../arc/ARC2.php");
+
+if (!class_exists('ARC2')) {
+    require_once(dirname(__FILE__)."/../arc/ARC2.php");          }
+}
 require_once(dirname(__FILE__)."/Authentication_AgentAbstract.php");
 /**
  * @author Akbar Hossain
