@@ -35,6 +35,7 @@ Checkout and create a script that will be the entry point for your application:
 
     if (!$auth->isAuthenticated()) 
     { 
+      echo $auth->authnDiagnostic;
       echo '<a href="https://foafssl.org/srv/idp?authreqissuer=http://localhost/index.php">Click here to Login</a>';
     } 
     else 
