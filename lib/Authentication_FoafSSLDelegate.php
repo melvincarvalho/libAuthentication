@@ -122,7 +122,7 @@ class Authentication_FoafSSLDelegate {
 
         $this->requestURI        = $request;
         $this->referer           = NULL != $referer ?
-                                    $referer->parsedURL :
+                                    $referer :
                                     Authentication_URL::parse($_GET["referer"]);
         $this->ts                = $ts;
         $this->webid             = $request->getQueryParameter('webid', $_GET["webid"]);
