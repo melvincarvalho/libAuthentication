@@ -31,7 +31,9 @@
 //
 //-----------------------------------------------------------------------------------------------------------------------------------
 
-require_once(dirname(__FILE__)."/../arc/ARC2.php");
+if (!class_exists('ARC2')) {
+    require_once(dirname(__FILE__)."/../arc/ARC2.php");
+}
 require_once(dirname(__FILE__)."/Authentication_RDFCache.php");
 require_once(dirname(__FILE__)."/Authentication_Helper.php");
 require_once(dirname(__FILE__)."/Authentication_FoafSSLAbstract.php");

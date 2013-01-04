@@ -120,7 +120,8 @@ class Authentication_FoafSSLDelegate {
                     );
         }
 
-        $error = $request->getQueryParameter('error', $_GET["error"]);
+        if (!empty($_GET["error"]))
+            $error = $request->getQueryParameter('error', $_GET["error"]);
         $sig = $request->getQueryParameter('sig', $_GET["sig"]);
         $ts = $request->getQueryParameter('ts', $_GET["ts"]);
 
