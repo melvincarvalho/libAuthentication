@@ -88,9 +88,11 @@ class Authentication_URL
         $this->parsedURL = $URL_string;
         $this->scheme = isset($URL_map['scheme']) ? $URL_map['scheme'] : 'http' ;
         $this->host = $URL_map['host'];
-	$this->port = isset($URL_map['port']) ? (int)$URL_map['port'] : ($this->scheme == 'https') ? 443 : 80;
+        $this->port = isset($URL_map['port']) ? (int)$URL_map['port'] : ($this->scheme == 'https') ? 443 : 80;
         $this->path = isset($URL_map['path']) ? $URL_map['path'] : '';
-        parse_str($URL_map['query'],$this->query);
+        if (!empty($URL_map['query'])) {
+            parse_str($URL_map['query'],$this->query);
+        }
         if (!$this->query)
                 $this->query = array();
 
@@ -101,7 +103,7 @@ class Authentication_URL
         $this->path .= isset ( $URL_map['query'] ) ? "?$URL_map[query]" : '';
         if (isset($URL_map['fragment']))
             $this->path .= '#'.$URL_map['fragment'];
-        
+
         return true;
     }
 }
