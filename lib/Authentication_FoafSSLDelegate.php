@@ -61,16 +61,16 @@ class Authentication_FoafSSLDelegate {
 
     const STATUS_AUTH_VIA_SESSION =
     "Authenticated via a session";
-    
+
     const STATUS_DELEGATED_LOGIN_OK =
     "Delegated FOAF Login response has been authenticated";
-    
+
     const STATUS_SIGNATURE_VERIFICATION_ERR =
     "Signature on response could not be verified";
-    
+
     const STATUS_UNSUPPORTED_SIGNATURE_ALG_ERR =
     "Unsupported signature algorithm";
-    
+
     const STATUS_IDP_RESPONSE_TIMEOUT_ERR =
     "Response from delegate IdP was outside of the allowed time window";
 
@@ -120,17 +120,16 @@ class Authentication_FoafSSLDelegate {
                     );
         }
 
-        if (!empty($_GET["error"]))
-            $error = $request->getQueryParameter('error', $_GET["error"]);
-        $sig = $request->getQueryParameter('sig', $_GET["sig"]);
-        $ts = $request->getQueryParameter('ts', $_GET["ts"]);
+        $error = $request->getQueryParameter('error', isset($_GET["error"]) ? $_GET["error"] : NULL);
+        $sig = $request->getQueryParameter('sig', isset($_GET["sig"]) ? $_GET["sig"] : NULL);
+        $ts = $request->getQueryParameter('ts', isset($_GET["ts"]) ? $_GET["ts"] : NULL);
 
         $this->requestURI        = $request;
         $this->referer           = NULL != $referer ?
                                     $referer :
                                     Authentication_URL::parse($_GET["referer"]);
         $this->ts                = $ts;
-        $this->webid             = $request->getQueryParameter('webid', $_GET["webid"]);
+        $this->webid             = $request->getQueryParameter('webid', isset($_GET["webid"]) ? $_GET["webid"] : NULL);
         $this->allowedTimeWindow = $allowedTimeWindow;
 
         $this->elapsedTime = time() - strtotime($ts);
